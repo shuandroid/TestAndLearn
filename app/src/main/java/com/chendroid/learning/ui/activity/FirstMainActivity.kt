@@ -25,7 +25,7 @@ class FirstMainActivity : BaseActivity() {
     }
 
     private fun initTabLayout() {
-        main_tab_layout.tabMode = TabLayout.MODE_SCROLLABLE
+//        main_tab_layout.tabMode = TabLayout.MODE_SCROLLABLE
 
         val firstHomeFragment = FirstHomeFragment()
         val moreTypeFragment = MoreTypeFragment()
@@ -35,7 +35,8 @@ class FirstMainActivity : BaseActivity() {
         var fragmentList = listOf<Fragment>(firstHomeFragment, moreTypeFragment)
 
         main_view_pager.adapter = FirstMainPagerAdapter(tabTitleList, fragmentList, supportFragmentManager)
-        main_tab_layout.setupWithViewPager(main_view_pager)
+//        main_tab_layout.setupWithViewPager(main_view_pager)
+        main_tab_layout.setViewPager(main_view_pager)
     }
 
     private fun initViewPager() {

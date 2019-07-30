@@ -10,10 +10,9 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:layout_height="56dp"
+        android:background="@color/colorPrimary"
         android:fitsSystemWindows="true"
-        app:contentInsetStartWithNavigation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -21,15 +20,17 @@
         tools:text="@string/first_activity_title" />
 
 
-    <android.support.design.widget.TabLayout
+    <com.chendroid.learning.widget.view.CustomTabLayout
         android:id="@+id/main_tab_layout"
         android:layout_width="0dp"
         android:layout_height="36dp"
+        android:background="@color/colorPrimary"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:tabMaxWidth="120dp"
-        app:tabMinWidth="90dp" />
+        app:tl_indicator_height="2dp"
+        app:tl_indicator_width_equal_title="true"
+        app:tl_textBold="2" />
 
 
     <android.support.v4.view.ViewPager
@@ -42,29 +43,5 @@
         app:layout_constraintTop_toBottomOf="@id/main_tab_layout">
 
     </android.support.v4.view.ViewPager>
-
-
-    <!--<com.chendroid.learning.widget.InkPageIndicator-->
-    <!--android:id="@+id/first_main_indicator"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginTop="@dimen/margin_small"-->
-    <!--android:visibility="visible"-->
-    <!--app:currentPageIndicatorColor="@color/colorPrimaryDark"-->
-    <!--app:dotDiameter="6dp"-->
-    <!--app:dotGap="8dp"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--app:layout_constraintStart_toStartOf="parent"-->
-    <!--app:layout_constraintTop_toBottomOf="@+id/main_view_pager"-->
-    <!--app:pageIndicatorColor="@color/colorPrimary" />-->
-
-
-    <!--<android.support.v7.widget.RecyclerView-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--app:layout_constraintStart_toStartOf="parent"-->
-    <!--app:layout_constraintTop_toBottomOf="@+id/first_main_indicator"-->
-    <!--tools:listitem="@layout/layout_article_list_item" />-->
 
 </android.support.constraint.ConstraintLayout>
