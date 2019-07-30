@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.jakewharton.butterknife'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 apply plugin: 'kotlin-android-extensions'
 
@@ -14,12 +15,6 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-//        javaCompileOptions {
-//            annotationProcessorOptions {
-//                arguments = [moduleNameOfSugarAdapter: 'app']
-//            }
-//        }
-
     }
     buildTypes {
         release {
@@ -30,14 +25,7 @@ android {
 }
 
 configurations.all {
-//    exclude
     resolutionStrategy {
-//        eachDependency { details ->
-//            if (details.requested.group == 'com.android.support' && !details.requested.name.contains("multidex")) {
-//                details.useVersion versions.support
-//            }
-//        }
-
         force 'com.android.support:support-v4:27.1.0'
     }
 }
@@ -64,10 +52,7 @@ dependencies {
     implementation ('com.zhihu.android:sugaradapter:1.7.10') {
         exclude module: 'recyclerview-v7'
     }
-    annotationProcessor 'com.zhihu.android:sugaradapter-processor:1.7.10'
-
-//    implementation 'com.jakewharton:butterknife:9.0.0'
-//    annotationProcessor 'com.jakewharton:butterknife-compiler:9.0.0'
+    kapt 'com.zhihu.android:sugaradapter-processor:1.7.10'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
@@ -79,6 +64,12 @@ dependencies {
 
     implementation "com.gyf.barlibrary:barlibrary:2.3.0"
 
+    implementation "com.github.bumptech.glide:glide:3.7.0"
 
 
+}
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
 }

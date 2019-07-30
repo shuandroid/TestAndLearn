@@ -27,6 +27,7 @@ object ApiServiceHelper {
     private const val CONNECT_TIMEOUT = 30L
     private const val READ_TIMEOUT = 10L
 
+    val wanAndroidService: WanAndroidService = ApiServiceHelper.getService(Constant.REQUEST_BASE_URL, WanAndroidService::class.java)
 
     private fun create(url: String): Retrofit {
         val okHttpClientBuilder = OkHttpClient().newBuilder().apply {

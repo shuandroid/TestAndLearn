@@ -7,7 +7,7 @@ package com.chendroid.learning.bean
  */
 data class HomeBanner(
 
-        var bannerData: List<BannerItemData>?,
+        var data: List<BannerItemData>?,
         var errorCode: Int,
         var errorMsg: String?
 
