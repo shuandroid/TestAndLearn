@@ -3,4 +3,6 @@
     <string name="first_button_learning">装逼</string>
 
     <string name="first_activity_title">玩一玩</string>
+
+    <string name="tag_text">%1$s&#160;%2$s</string>
 </resources>

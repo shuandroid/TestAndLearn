@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.chendroid.learning.widget.view.TagView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/answer_tag_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="10dp"
+    android:minHeight="30dp"
+    app:tagBackground="@drawable/tag_default_bg"
+    app:tagStatus="status_default"
+    app:tagCount="0"
+    app:tagText="测试 tag"
+    app:tagTextColor="@color/GBK05A"
+    app:tagTextSize="14sp">
+
+</com.chendroid.learning.widget.view.TagView>

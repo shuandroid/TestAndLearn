@@ -1,6 +1,7 @@
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.res.Resources
 import android.support.annotation.LayoutRes
 import android.support.annotation.StringRes
 import android.util.Log
@@ -122,3 +123,6 @@ inline fun tryCatch(catchBlock: (Throwable) -> Unit = {}, tryBlock: () -> Unit) 
         catchBlock(t)
     }
 }
+
+val Number.dp get() = (toInt() * Resources.getSystem().displayMetrics.density).toInt()
+

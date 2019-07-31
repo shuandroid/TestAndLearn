@@ -10,5 +10,10 @@
     <color name="while_most_color">#e4e4e4</color>
     <color name="black_trans">#5c000000</color>
 
+    <!--todo 想弄一套色组-->
+    <color name="GBK05A">#808080</color>
+
+    <color name="GBL01A">#0084FF</color>
+    <color name="GBL05A">#8590A6</color>
 
 </resources>
