@@ -5,4 +5,6 @@
     <string name="first_activity_title">玩一玩</string>
 
     <string name="tag_text">%1$s&#160;%2$s</string>
+
+    <string name="tag_test_text">标签一二</string>
 </resources>
