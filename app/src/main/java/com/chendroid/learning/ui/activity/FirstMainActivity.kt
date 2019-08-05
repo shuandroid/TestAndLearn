@@ -36,7 +36,8 @@ class FirstMainActivity : BaseActivity() {
 
         main_view_pager.adapter = FirstMainPagerAdapter(tabTitleList, fragmentList, supportFragmentManager)
 //        main_tab_layout.setupWithViewPager(main_view_pager)
-        main_tab_layout.setViewPager(main_view_pager)
+        main_tab_layout.setupWithViewPager(main_view_pager)
+        main_tab_layout.setTabIndicatorFullWidth(false)
     }
 
     private fun initViewPager() {

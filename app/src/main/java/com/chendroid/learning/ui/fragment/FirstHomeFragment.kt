@@ -93,7 +93,7 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
 
     //当是 悬停状态 idle 时，需要开启自动切换开关
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
-        override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
             when (newState) {
                 RecyclerView.SCROLL_STATE_IDLE -> {

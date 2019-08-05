@@ -20,7 +20,20 @@
         tools:text="@string/first_activity_title" />
 
 
-    <com.chendroid.learning.widget.view.CustomTabLayout
+    <!--<com.chendroid.learning.widget.view.CustomTabLayout-->
+    <!--android:id="@+id/main_tab_layout"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="36dp"-->
+    <!--android:background="@color/colorPrimary"-->
+    <!--app:layout_constraintLeft_toLeftOf="parent"-->
+    <!--app:layout_constraintRight_toRightOf="parent"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/toolbar"-->
+    <!--app:tl_indicator_height="2dp"-->
+    <!--app:tl_indicator_width_equal_title="true"-->
+    <!--app:tl_textBold="2" />-->
+
+    <!-- support 升级到 28 后，可以使用原生的 TabLayout -->
+    <android.support.design.widget.TabLayout
         android:id="@+id/main_tab_layout"
         android:layout_width="0dp"
         android:layout_height="36dp"
@@ -28,10 +41,9 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:tl_indicator_height="2dp"
-        app:tl_indicator_width_equal_title="true"
-        app:tl_textBold="2" />
-
+        app:tabIndicatorColor="@color/white"
+        app:tabMode="scrollable"
+        app:tabTextColor="@color/white" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/main_view_pager"
