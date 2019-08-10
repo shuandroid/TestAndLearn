@@ -2,7 +2,7 @@ package com.chendroid.learning.widget.view;
 
 /**
  * @author zhaochen @ Zhihu Inc.
- * @intro
+ * @intro tab 的滑动监听地方
  * @since 2019/4/29
  */
 public interface OnTabSelectListener {

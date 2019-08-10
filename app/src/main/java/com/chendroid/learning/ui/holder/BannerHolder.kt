@@ -11,6 +11,7 @@ import com.chendroid.learning.bean.HomeBanner
 import com.zhihu.android.sugaradapter.Id
 import com.zhihu.android.sugaradapter.Layout
 import com.zhihu.android.sugaradapter.SugarHolder
+import kotlinx.android.synthetic.main.holder_first_banner_home_layout.view.*
 
 /**
  * @intro
@@ -20,7 +21,9 @@ import com.zhihu.android.sugaradapter.SugarHolder
 @Layout(R.layout.holder_first_banner_home_layout)
 class BannerHolder(view: View) : SugarHolder<HomeBanner.BannerItemData>(view) {
 
-    private val imageView: ImageView  by lazy { view.findViewById<ImageView>(R.id.home_banner_image) }
+    private val imageView by lazy {
+        view.home_banner_image
+    }
 
     override fun onBindData(data: HomeBanner.BannerItemData) {
         Log.e("zc_test", "BannerHolder  onBindData")

@@ -66,6 +66,7 @@ dependencies {
 
     implementation "com.github.bumptech.glide:glide:3.7.0"
 
+    implementation "com.just.agentweb:agentweb:4.0.3-beta"
 
 }
 kotlin {
