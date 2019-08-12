@@ -25,7 +25,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     protected abstract fun setLayoutId(): Int
 
-    protected fun initImmersionBar() {
+    open protected fun initImmersionBar() {
         immersionBar = ImmersionBar.with(this)
         immersionBar.init()
     }

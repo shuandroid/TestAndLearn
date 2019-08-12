@@ -1,5 +1,7 @@
 package com.chendroid.learning.ui.holder
 
+import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -7,6 +9,7 @@ import android.widget.TextView
 import com.chendroid.learning.R
 import com.chendroid.learning.bean.BaseDatas
 import com.chendroid.learning.bean.HomeListResponse
+import com.chendroid.learning.ui.activity.ContentDetailActivity
 import com.zhihu.android.sugaradapter.Id
 import com.zhihu.android.sugaradapter.Layout
 import com.zhihu.android.sugaradapter.SugarHolder
@@ -64,7 +67,14 @@ class HomeListBanner(view: View) : SugarHolder<BaseDatas>(view), View.OnClickLis
 
         if (clickView === itemView) {
             // 进入具体的文章界面
-
+            Intent(context, ContentDetailActivity::class.java).run {
+                val bundle = Bundle()
+                bundle.putString(Constant.CONTENT_TITLE_KEY, this@HomeListBanner.data.title)
+                bundle.putString(Constant.CONTENT_URL_KEY, this@HomeListBanner.data.link)
+                bundle.putInt(Constant.CONTENT_ID_KEY, this@HomeListBanner.data.id)
+                putExtras(bundle)
+                context.startActivity(this)
+            }
         }
     }
 

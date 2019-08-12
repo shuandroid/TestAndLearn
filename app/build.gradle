@@ -58,15 +58,13 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    implementation "com.just.agentweb:agentweb:3.0.0"
-
     implementation "com.squareup.okhttp3:logging-interceptor:3.6.0"
 
     implementation "com.gyf.barlibrary:barlibrary:2.3.0"
 
     implementation "com.github.bumptech.glide:glide:3.7.0"
 
-    implementation "com.just.agentweb:agentweb:4.0.3-beta"
+    implementation "com.just.agentweb:agentweb:4.1.2"
 
 }
 kotlin {
