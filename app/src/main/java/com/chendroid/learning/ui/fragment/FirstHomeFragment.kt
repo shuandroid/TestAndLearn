@@ -93,6 +93,7 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
 
     //当是 悬停状态 idle 时，需要开启自动切换开关
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
+        // RecyclerView 的滚动监听
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
             when (newState) {
@@ -101,6 +102,15 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
                     startSwitchJob()
                 }
             }
+        }
+    }
+
+    // 文章列表的滚动监听
+    private val articleListScrollListener = object : RecyclerView.OnScrollListener() {
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            this@FirstHomeFragment.onScrolled(recyclerView, dx, dy)
         }
     }
 
@@ -164,6 +174,7 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
         homeListRecyclerView?.run {
             layoutManager = verticalLayoutManager
             adapter = homeListAdapter
+            addOnScrollListener(articleListScrollListener)
         }
 
         homeFragmentPresenter.getBanner()
@@ -277,6 +288,50 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
 
     override fun collectArticleFailed(errorMessage: String?, isAdd: Boolean) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+
+    // 滚动时会调用该方法，去判断是否需要加载新的数据 loadMore
+    private fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+
+        if (dy == 0) {
+            return
+        }
+
+        if (isScrollingTriggerLoadingMore(recyclerView)) {
+            recyclerView.post { loadMoreData() }
+        }
+    }
+
+    /**
+     * 只对 LinearLayoutManager 生效，其他 LayoutManager 请重写此方法
+     */
+    private fun isScrollingTriggerLoadingMore(recyclerView: RecyclerView): Boolean {
+        val layoutManager = recyclerView.layoutManager
+
+        layoutManager?.run {
+            val totalItemCount = itemCount
+            val lastVisibleItemPosition = if (this is LinearLayoutManager) {
+                findLastVisibleItemPosition()
+            } else {
+                return false
+            }
+
+            return totalItemCount > 0 && totalItemCount - lastVisibleItemPosition - 1 <= 5
+        }
+
+        return false
+    }
+
+    /**
+     * 获取更多数据
+     */
+    private fun loadMoreData() {
+        homeListAdapter?.run {
+            val page = list.size / 20 + 1
+
+            homeFragmentPresenter.getHomeList(page)
+        }
     }
 
 }

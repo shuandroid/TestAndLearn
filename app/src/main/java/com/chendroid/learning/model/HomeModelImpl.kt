@@ -42,7 +42,7 @@ class HomeModelImpl : HomeModel {
                     return@async
                 }
                 //获取成功
-                onBannerListener.getBannerSuccess(result)
+                onBannerListener.getBannerSuccess(result!!)
             }
         }
     }
@@ -73,7 +73,7 @@ class HomeModelImpl : HomeModel {
 
                 Log.i("zc_test", "请求文章列表成功 haHa")
 
-                onHomeListListener.getHomeListSuccess(result)
+                onHomeListListener.getHomeListSuccess(result!!)
             }
         }
     }
