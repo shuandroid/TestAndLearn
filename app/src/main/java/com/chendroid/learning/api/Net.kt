@@ -1,6 +1,7 @@
 package com.chendroid.learning.api
 
 import android.support.annotation.VisibleForTesting
+import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.experimental.CoroutineCallAdapterFactory
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
@@ -20,7 +21,7 @@ import kotlin.math.max
  * @author zhaochen@ZhiHu Inc.
  * @since 2019-08-12
  */
-class Net {
+object Net {
 
     private val mServiceMap = ConcurrentHashMap<Class<*>, Any>()
     private val mWrapperScheduler = Schedulers.from(WrapperExecutor())
@@ -28,7 +29,10 @@ class Net {
 
     private val sRetrofit by lazy {
         val builder = Retrofit.Builder()
-        builder.client(OkHttpClient())
+        val okHttpClientBuilder = OkHttpClient().newBuilder()
+        okHttpClientBuilder.addNetworkInterceptor(StethoInterceptor())
+        builder.client(okHttpClientBuilder.build())
+
         builder.baseUrl("https://wanandroid.com/")
         builder.addConverterFactory(GsonConverterFactory.create())
         builder.addCallAdapterFactory(CoroutineCallAdapterFactory())

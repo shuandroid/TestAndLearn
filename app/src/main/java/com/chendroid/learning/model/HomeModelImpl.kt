@@ -3,6 +3,7 @@ package com.chendroid.learning.model
 import android.util.Log
 import cancelByActive
 import com.chendroid.learning.api.ApiServiceHelper
+import com.chendroid.learning.api.Net
 import com.chendroid.learning.api.WanAndroidService
 import com.chendroid.learning.bean.HomeBanner
 import com.chendroid.learning.bean.HomeListResponse
@@ -64,6 +65,7 @@ class HomeModelImpl : HomeModel {
             }) {
                 homeListAsync?.cancelByActive()
                 homeListAsync = ApiServiceHelper.wanAndroidService.getHomeList(page)
+
                 val result = homeListAsync?.await()
                 result ?: let {
                     Log.i("zc_test", "请求文章列表失败 2333")
