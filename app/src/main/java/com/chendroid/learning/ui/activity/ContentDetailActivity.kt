@@ -51,6 +51,7 @@ class ContentDetailActivity : BaseActivity() {
             title = "加载中"
             setSupportActionBar(this)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            setNavigationOnClickListener { finish() }
         }
 
         initImmersionBar()

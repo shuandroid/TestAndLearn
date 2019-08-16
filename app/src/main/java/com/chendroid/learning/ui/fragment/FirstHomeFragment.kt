@@ -21,13 +21,11 @@ import com.chendroid.learning.ui.view.CollectArticleView
 import com.chendroid.learning.ui.view.FirstHomeFragmentView
 import com.chendroid.learning.widget.view.BannerRecyclerView
 import com.zhihu.android.sugaradapter.SugarAdapter
-import com.zhihu.android.sugaradapter.SugarHolder
 import kotlinx.android.synthetic.main.fragment_first_home_layout.*
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import toast
-import java.util.*
 
 /**
  * @intro
@@ -53,7 +51,7 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
 
     private var listHolderBuilder: SugarAdapter.Builder = SugarAdapter.Builder.with(articleList)
 
-    private val bannerDatas = mutableListOf<HomeBanner.BannerItemData>()
+    private val bannerDataList = mutableListOf<HomeBanner.BannerItemData>()
 
     private var bannerAdapter: SugarAdapter? = null
 
@@ -211,13 +209,13 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
 
     private fun getBannerSwitchJob() = launch {
         repeat(Int.MAX_VALUE) {
-            if (bannerDatas.size == 0) {
+            if (bannerDataList.size == 0) {
                 return@launch
             }
 
             delay(BANNER_TIME)
             currentIndex++
-            val index = currentIndex % bannerDatas.size
+            val index = currentIndex % bannerDataList.size
 
             bannerRecyclerView?.smoothScrollToPosition(index)
             currentIndex = index
@@ -243,11 +241,11 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
     }
 
     override fun getHomeListZero() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+
     }
 
     override fun getHomeListSmall(result: HomeListResponse) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun getBannerSuccess(result: HomeBanner) {
@@ -255,7 +253,7 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
 
         result.data?.let {
             bannerList.addAll(it)
-            bannerDatas.addAll(it)
+            bannerDataList.addAll(it)
             startSwitchJob()
             bannerAdapter?.notifyDataSetChanged()
 
@@ -298,7 +296,7 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
             return
         }
 
-        if (isScrollingTriggerLoadingMore(recyclerView)) {
+        if (isScrollingTriggerLoadingMore(recyclerView) && canLoadMore()) {
             recyclerView.post { loadMoreData() }
         }
     }
@@ -324,10 +322,23 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
     }
 
     /**
+     * 判断是否可以加载数据
+     * 防止重复拉取数据
+     */
+    private fun canLoadMore(): Boolean {
+        return homeFragmentPresenter.canLoadMore()
+    }
+
+    /**
      * 获取更多数据
      */
     private fun loadMoreData() {
         homeListAdapter?.run {
+
+            if (!canLoadMore()) {
+                return
+            }
+
             val page = list.size / 20 + 1
 
             homeFragmentPresenter.getHomeList(page)
