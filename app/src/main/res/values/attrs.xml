@@ -50,4 +50,27 @@
 
     </declare-styleable>
 
+    <!--标签的自定义 style-->
+    <declare-styleable name="TagViewStyle">
+        <!--标签的文本-->
+        <attr name="tagText" format="string" />
+        <!--标签的数量-->
+        <attr name="tagCount" format="string" />
+        <!--标签文本颜色-->
+        <attr name="tagTextColor" format="color" />
+        <!--标签文本字体大小-->
+        <attr name="tagTextSize" format="dimension" />
+        <!--标签背景颜色-->
+        <attr name="tagBackground" format="reference" />
+
+        <attr name="tagStatus" format="enum">
+            <enum name="status_default" value="0"/>
+            <enum name="status_selected" value="1"/>
+            <enum name="status_un_enable" value="2"/>
+            <enum name="status_just_show" value="3"/>
+            <enum name="status_dialog_style" value="4"/>
+        </attr>
+
+    </declare-styleable>
+
 </resources>
