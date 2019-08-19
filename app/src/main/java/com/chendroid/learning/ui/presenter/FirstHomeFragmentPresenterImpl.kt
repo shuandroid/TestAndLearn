@@ -23,6 +23,9 @@ class FirstHomeFragmentPresenterImpl(
 
     private val homeModel: HomeModel = HomeModelImpl()
 
+    // 是否在正在加载数据
+    private var isLoadingArticleData = false
+
     override fun getBanner() {
 
         homeModel.getBanner(this)
@@ -50,11 +53,13 @@ class FirstHomeFragmentPresenterImpl(
     // presenter 层去获取 model 数据， 通过接口实现 在 presenter 和 model 间传递数据
     override fun getHomeList(page: Int) {
 
+        isLoadingArticleData = true
         homeModel.getHomeList(this, page)
     }
 
     // 获取文章列表数据成功回调
     override fun getHomeListSuccess(@NonNull result: HomeListResponse) {
+        isLoadingArticleData = false
         // errorCode = 0 为正常请求
         if (result.errorCode != 0) {
             Log.i("zc_test", "获取的 errorCode 错误码不正确")
@@ -83,14 +88,22 @@ class FirstHomeFragmentPresenterImpl(
     }
 
     override fun getHomeListFailed(errorMessage: String?) {
+        isLoadingArticleData = false
         homeFragmentView.getHomeListFailed(errorMessage)
     }
 
     // 暂停网络请求
     fun cancelRequest() {
+        isLoadingArticleData = false
         homeModel.cancelBannerRequest()
         homeModel.cancelHomeListRequest()
     }
 
+    /**
+     * 是否可以再次读取数据
+     */
+    fun canLoadMore(): Boolean {
+        return !isLoadingArticleData
+    }
 
 }

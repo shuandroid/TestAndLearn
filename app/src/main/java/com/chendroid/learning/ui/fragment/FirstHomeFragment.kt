@@ -21,13 +21,11 @@ import com.chendroid.learning.ui.view.CollectArticleView
 import com.chendroid.learning.ui.view.FirstHomeFragmentView
 import com.chendroid.learning.widget.view.BannerRecyclerView
 import com.zhihu.android.sugaradapter.SugarAdapter
-import com.zhihu.android.sugaradapter.SugarHolder
 import kotlinx.android.synthetic.main.fragment_first_home_layout.*
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import toast
-import java.util.*
 
 /**
  * @intro
@@ -53,7 +51,7 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
 
     private var listHolderBuilder: SugarAdapter.Builder = SugarAdapter.Builder.with(articleList)
 
-    private val bannerDatas = mutableListOf<HomeBanner.BannerItemData>()
+    private val bannerDataList = mutableListOf<HomeBanner.BannerItemData>()
 
     private var bannerAdapter: SugarAdapter? = null
 
@@ -93,7 +91,8 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
 
     //当是 悬停状态 idle 时，需要开启自动切换开关
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
-        override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+        // RecyclerView 的滚动监听
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
             when (newState) {
                 RecyclerView.SCROLL_STATE_IDLE -> {
@@ -101,6 +100,15 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
                     startSwitchJob()
                 }
             }
+        }
+    }
+
+    // 文章列表的滚动监听
+    private val articleListScrollListener = object : RecyclerView.OnScrollListener() {
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            this@FirstHomeFragment.onScrolled(recyclerView, dx, dy)
         }
     }
 
@@ -164,6 +172,7 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
         homeListRecyclerView?.run {
             layoutManager = verticalLayoutManager
             adapter = homeListAdapter
+            addOnScrollListener(articleListScrollListener)
         }
 
         homeFragmentPresenter.getBanner()
@@ -200,13 +209,13 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
 
     private fun getBannerSwitchJob() = launch {
         repeat(Int.MAX_VALUE) {
-            if (bannerDatas.size == 0) {
+            if (bannerDataList.size == 0) {
                 return@launch
             }
 
             delay(BANNER_TIME)
             currentIndex++
-            val index = currentIndex % bannerDatas.size
+            val index = currentIndex % bannerDataList.size
 
             bannerRecyclerView?.smoothScrollToPosition(index)
             currentIndex = index
@@ -232,11 +241,11 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
     }
 
     override fun getHomeListZero() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+
     }
 
     override fun getHomeListSmall(result: HomeListResponse) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun getBannerSuccess(result: HomeBanner) {
@@ -244,7 +253,7 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
 
         result.data?.let {
             bannerList.addAll(it)
-            bannerDatas.addAll(it)
+            bannerDataList.addAll(it)
             startSwitchJob()
             bannerAdapter?.notifyDataSetChanged()
 
@@ -277,6 +286,63 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
 
     override fun collectArticleFailed(errorMessage: String?, isAdd: Boolean) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+
+    // 滚动时会调用该方法，去判断是否需要加载新的数据 loadMore
+    private fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+
+        if (dy == 0) {
+            return
+        }
+
+        if (isScrollingTriggerLoadingMore(recyclerView) && canLoadMore()) {
+            recyclerView.post { loadMoreData() }
+        }
+    }
+
+    /**
+     * 只对 LinearLayoutManager 生效，其他 LayoutManager 请重写此方法
+     */
+    private fun isScrollingTriggerLoadingMore(recyclerView: RecyclerView): Boolean {
+        val layoutManager = recyclerView.layoutManager
+
+        layoutManager?.run {
+            val totalItemCount = itemCount
+            val lastVisibleItemPosition = if (this is LinearLayoutManager) {
+                findLastVisibleItemPosition()
+            } else {
+                return false
+            }
+
+            return totalItemCount > 0 && totalItemCount - lastVisibleItemPosition - 1 <= 5
+        }
+
+        return false
+    }
+
+    /**
+     * 判断是否可以加载数据
+     * 防止重复拉取数据
+     */
+    private fun canLoadMore(): Boolean {
+        return homeFragmentPresenter.canLoadMore()
+    }
+
+    /**
+     * 获取更多数据
+     */
+    private fun loadMoreData() {
+        homeListAdapter?.run {
+
+            if (!canLoadMore()) {
+                return
+            }
+
+            val page = list.size / 20 + 1
+
+            homeFragmentPresenter.getHomeList(page)
+        }
     }
 
 }

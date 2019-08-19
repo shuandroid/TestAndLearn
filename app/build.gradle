@@ -6,11 +6,11 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.chendroid.learning"
         minSdkVersion 21
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -26,7 +26,7 @@ android {
 
 configurations.all {
     resolutionStrategy {
-        force 'com.android.support:support-v4:27.1.0'
+        force 'com.android.support:support-v4:28.0.0'
     }
 }
 
@@ -47,9 +47,9 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-experimental-adapter:1.0.0"
 
-    implementation 'com.android.support:support-v4:27.1.0'
+    implementation 'com.android.support:support-v4:28.0.0'
 
-    implementation ('com.zhihu.android:sugaradapter:1.7.10') {
+    implementation('com.zhihu.android:sugaradapter:1.7.10') {
         exclude module: 'recyclerview-v7'
     }
     kapt 'com.zhihu.android:sugaradapter-processor:1.7.10'
@@ -58,14 +58,22 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    implementation "com.just.agentweb:agentweb:3.0.0"
-
     implementation "com.squareup.okhttp3:logging-interceptor:3.6.0"
 
     implementation "com.gyf.barlibrary:barlibrary:2.3.0"
 
     implementation "com.github.bumptech.glide:glide:3.7.0"
 
+    implementation "com.just.agentweb:agentweb:4.1.2"
+
+    api "io.reactivex.rxjava2:rxjava:${versions.rxjava}"
+
+    //圆形 CircleImageView
+    api 'de.hdodenhof:circleimageview:3.0.0'
+
+    // chrome inspector
+    implementation 'com.facebook.stetho:stetho:1.5.1'
+    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.1'
 
 }
 kotlin {
