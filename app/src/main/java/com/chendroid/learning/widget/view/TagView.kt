@@ -15,7 +15,8 @@ import dp
  * @author zhaochen @ Zhihu Inc.
  * @since  2019/7/30
  */
-class TagView constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+class TagView @JvmOverloads
+constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
         FrameLayout(context, attrs, defStyleAttr) {
 
     companion object {

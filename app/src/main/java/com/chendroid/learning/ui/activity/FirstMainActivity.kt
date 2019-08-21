@@ -1,14 +1,12 @@
 package com.chendroid.learning.ui.activity
 
 import android.os.Bundle
-import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import com.chendroid.learning.R
-import com.chendroid.learning.api.ApiServiceHelper
 import com.chendroid.learning.base.BaseActivity
 import com.chendroid.learning.ui.adapter.FirstMainPagerAdapter
 import com.chendroid.learning.ui.fragment.FirstHomeFragment
-import com.chendroid.learning.ui.fragment.MoreTypeFragment
+import com.chendroid.learning.ui.fragment.MoreArticleTagFragment
 import kotlinx.android.synthetic.main.activity_first_main.*
 
 class FirstMainActivity : BaseActivity() {
@@ -28,7 +26,7 @@ class FirstMainActivity : BaseActivity() {
 //        main_tab_layout.tabMode = TabLayout.MODE_SCROLLABLE
 
         val firstHomeFragment = FirstHomeFragment()
-        val moreTypeFragment = MoreTypeFragment()
+        val moreTypeFragment = MoreArticleTagFragment()
 
         var tabTitleList = listOf<String>("首页", "更多")
 
