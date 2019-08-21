@@ -43,7 +43,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     // tag 回答数量
     var answerCount: String?
     // tag 文本
-    var tagText: String?
+    var tagText: String? = ""
+        set(value) {
+            field = value
+            updateTagTextReal()
+        }
     // tag 背景
     private var tagBackground: Int
 

@@ -22,7 +22,7 @@ data class ArticleTagData(
         // 是否可见
         var visible: Int,
         // 它包含的子 tag
-        var children: List<ChildrenTagData>
+        var children: List<ChildrenTagData>?
 
 ) : Parcelable {
     constructor(parcel: Parcel) : this(

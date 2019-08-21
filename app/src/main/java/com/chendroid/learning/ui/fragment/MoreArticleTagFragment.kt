@@ -15,6 +15,7 @@ import com.chendroid.learning.base.BaseFragment
 import com.chendroid.learning.bean.ArticleTagData
 import com.chendroid.learning.ui.holder.ArticleTypeHolder
 import com.chendroid.learning.vm.MoreArticleTagViewModel
+import com.chendroid.learning.widget.view.CustomItemDecoration
 import com.zhihu.android.sugaradapter.SugarAdapter
 import kotlinx.android.synthetic.main.fragment_more_type_layout.*
 
@@ -64,6 +65,9 @@ class MoreArticleTagFragment : BaseFragment() {
 
         setupSwipeRefreshLayout()
         setupRecyclerView()
+
+        // 首次刷新数据
+        refreshData()
     }
 
     private fun setupRecyclerView() {
@@ -78,6 +82,7 @@ class MoreArticleTagFragment : BaseFragment() {
         articleTypeAdapter = typeListBuilder.build()
 
         recyclerView.adapter = articleTypeAdapter
+        recyclerView.addItemDecoration(CustomItemDecoration.with(context!!))
 
         recyclerView.addOnScrollListener(articleListScrollListener)
     }
@@ -107,6 +112,7 @@ class MoreArticleTagFragment : BaseFragment() {
      */
     private fun refreshData() {
         // 刷新
+        swipeRefreshLayout.isRefreshing = true
         articleTagViewModel.refreshData()
     }
 
