@@ -1,9 +1,10 @@
 package com.chendroid.learning.ui.holder
 
 import android.graphics.Paint
+import android.util.Log
 import android.view.View
 import com.chendroid.learning.R
-import com.chendroid.learning.bean.ArticleTagData
+import com.chendroid.learning.ui.holder.data.ArticleTagDataWrapper
 import com.chendroid.learning.ui.holder.data.MoreTagData
 import com.google.android.flexbox.*
 import com.zhihu.android.sugaradapter.Layout
@@ -18,8 +19,7 @@ import kotlinx.android.synthetic.main.holder_article_type_layout.view.*
  * @since 2019-08-21
  */
 @Layout(R.layout.holder_article_type_layout)
-class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagData>(view), TagInnerMoreHolder.MoreTagListener {
-
+class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagDataWrapper>(view), TagInnerMoreHolder.MoreTagListener {
 
     private val articleTypeView by lazy {
         itemView.article_type_title
@@ -30,9 +30,6 @@ class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagData>(view), TagInne
     }
 
     private val tagsList: MutableList<Any> = mutableListOf()
-
-    // 是否需要展示所有的 tag，外部 fragment 可控制。目前逻辑：一旦展开后，不支持折叠。
-    var needShowAllTag = false
 
     private val tagsItemBuilder by lazy {
         SugarAdapter.Builder.with(tagsList)
@@ -48,9 +45,9 @@ class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagData>(view), TagInne
         initRecyclerView()
     }
 
-    override fun onBindData(data: ArticleTagData) {
+    override fun onBindData(data: ArticleTagDataWrapper) {
 
-        articleTypeView.text = data.name
+        articleTypeView.text = data.articleTagData.name
 
         updateArticleTagList()
     }
@@ -83,14 +80,23 @@ class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagData>(view), TagInne
 
     private fun updateArticleTagList() {
 
-        if (data.children == null) {
+        if (data.articleTagData.children == null) {
             return
         }
 
-        data.children?.run {
+        data.articleTagData.children?.run {
 
             tagsList.clear()
-            if (needShowAllTag) {
+
+            if (itemView.tag == adapterPosition) {
+                Log.i("zc_test", "enenne =====")
+            } else {
+                Log.i("zc_test", "enenne !!!!!!!!=====")
+            }
+
+            itemView.tag = adapterPosition
+
+            if (data.showAllTag) {
                 tagsList.addAll(this)
                 tagsItemAdapter.notifyDataSetChanged()
             } else {
@@ -113,13 +119,13 @@ class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagData>(view), TagInne
         // 字体的大小是和 AnswerTagView 的字体大小一致的, 这里写死了代码，不是很友好。
         paint.textSize = 14.dp.toFloat()
         // 利用画笔测试文字的宽度
-        var allTagWidth = paint.measureText((data.children!!.size).toString() + "+").toInt()
+        var allTagWidth = paint.measureText((data.articleTagData.children!!.size).toString() + "+").toInt()
 
         allTagWidth += itemMargin + itemMarginEnd
 
         var indexList = -1
-        for (i in 0 until data.children!!.size) {
-            allTagWidth += paint.measureText(data.children!![i].name).toInt()
+        for (i in 0 until data.articleTagData.children!!.size) {
+            allTagWidth += paint.measureText(data.articleTagData.children!![i].name).toInt()
             allTagWidth += itemMarginEnd + itemMargin
 
             if (allTagWidth > screenWidth - marginWidth) {
@@ -129,12 +135,12 @@ class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagData>(view), TagInne
         }
 
         //检索到的 index 1. 要 >= 0  2. 要 <   data.data.size - 1 保证不是最后一个位置 3. 如果被选中的最后一个标签的位置，不在 indexList 里面需要展开全部的标签
-        if (indexList >= 0 && indexList < data.children!!.size - 1) {
-            tagsList.addAll(data.children!!.subList(0, indexList))
-            tagsList.add(indexList, MoreTagData((data.children!!.size - indexList).toString() + "+"))
+        if (indexList >= 0 && indexList < data.articleTagData.children!!.size - 1) {
+            tagsList.addAll(data.articleTagData.children!!.subList(0, indexList))
+            tagsList.add(indexList, MoreTagData((data.articleTagData.children!!.size - indexList).toString() + "+"))
         } else {
             //加入全部的数据，展示全部标签
-            tagsList.addAll(data.children!!)
+            tagsList.addAll(data.articleTagData.children!!)
         }
 
         tagsItemAdapter.notifyDataSetChanged()
@@ -145,10 +151,10 @@ class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagData>(view), TagInne
      */
     override fun onMoreTagViewClicked() {
 
-        needShowAllTag = true
+        data.showAllTag = true
         tagsList.clear()
 
-        tagsList.addAll(data.children!!)
+        tagsList.addAll(data.articleTagData.children!!)
         tagsItemAdapter.notifyDataSetChanged()
     }
 }

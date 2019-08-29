@@ -14,6 +14,7 @@ import com.chendroid.learning.R
 import com.chendroid.learning.base.BaseFragment
 import com.chendroid.learning.bean.ArticleTagData
 import com.chendroid.learning.ui.holder.ArticleTypeHolder
+import com.chendroid.learning.ui.holder.data.ArticleTagDataWrapper
 import com.chendroid.learning.vm.MoreArticleTagViewModel
 import com.chendroid.learning.widget.view.CustomItemDecoration
 import com.zhihu.android.sugaradapter.SugarAdapter
@@ -35,7 +36,7 @@ class MoreArticleTagFragment : BaseFragment() {
 
     //
     // 文章类型列表
-    private val articleTypeList: MutableList<ArticleTagData> = mutableListOf()
+    private val articleTypeList: MutableList<ArticleTagDataWrapper> = mutableListOf()
     // sugarAdapter builder
     private val typeListBuilder = SugarAdapter.Builder.with(articleTypeList)
 
@@ -124,7 +125,9 @@ class MoreArticleTagFragment : BaseFragment() {
             return
         }
 
-        articleTagDataList?.run {
+        articleTagDataList.map {
+            ArticleTagDataWrapper(it)
+        }.run {
             articleTypeList.addAll(this)
 
             articleTypeAdapter.notifyDataSetChanged()
