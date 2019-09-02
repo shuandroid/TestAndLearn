@@ -22,6 +22,11 @@ class FirstMainActivity : BaseActivity() {
         initTabLayout()
     }
 
+    override fun initImmersionBar() {
+        super.initImmersionBar()
+        immersionBar.titleBar(R.id.toolbar).init()
+    }
+
     private fun initTabLayout() {
 //        main_tab_layout.tabMode = TabLayout.MODE_SCROLLABLE
 
@@ -35,7 +40,7 @@ class FirstMainActivity : BaseActivity() {
         main_view_pager.adapter = FirstMainPagerAdapter(tabTitleList, fragmentList, supportFragmentManager)
 //        main_tab_layout.setupWithViewPager(main_view_pager)
         main_tab_layout.setupWithViewPager(main_view_pager)
-        main_tab_layout.setTabIndicatorFullWidth(false)
+        main_tab_layout.isTabIndicatorFullWidth = false
     }
 
     private fun initViewPager() {

@@ -1,7 +1,7 @@
 package com.chendroid.learning.bean
 
 /**
- * @intro
+ * @intro 文章的基本数据
  * @author zhaochen @ Zhihu Inc.
  * @since  2019/5/16
  */

@@ -61,4 +61,8 @@ object Constant {
 
     const val MAIN_REQUEST_CODE = 100
     const val MAIN_LIKE_REQUEST_CODE = 101
+
+    const val EXTRA_ARTICLE_TAG_DATA = "extra_article_tag_data"
+    const val EXTRA_TYPE_TITLE = "extra_type_title"
+
 }

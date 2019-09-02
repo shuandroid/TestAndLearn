@@ -1,7 +1,10 @@
 package com.chendroid.learning.ui.fragment
 
+import Constant.EXTRA_ARTICLE_TAG_DATA
+import Constant.EXTRA_TYPE_TITLE
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
@@ -13,6 +16,7 @@ import android.view.ViewGroup
 import com.chendroid.learning.R
 import com.chendroid.learning.base.BaseFragment
 import com.chendroid.learning.bean.ArticleTagData
+import com.chendroid.learning.ui.activity.TypeDetailActivity
 import com.chendroid.learning.ui.holder.ArticleTypeHolder
 import com.chendroid.learning.ui.holder.data.ArticleTagDataWrapper
 import com.chendroid.learning.vm.MoreArticleTagViewModel
@@ -25,7 +29,7 @@ import kotlinx.android.synthetic.main.fragment_more_type_layout.*
  * @author zhaochen @ Zhihu Inc.
  * @since  2019/4/18
  */
-class MoreArticleTagFragment : BaseFragment() {
+class MoreArticleTagFragment : BaseFragment(), ArticleTypeHolder.ArticleTypeListener {
 
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
@@ -78,7 +82,9 @@ class MoreArticleTagFragment : BaseFragment() {
 
         recyclerView.layoutManager = verticalLayoutManager
 
-        typeListBuilder.add(ArticleTypeHolder::class.java)
+        typeListBuilder.add(ArticleTypeHolder::class.java) { holder ->
+            holder.articleTypeListener = this
+        }
 
         articleTypeAdapter = typeListBuilder.build()
 
@@ -135,6 +141,19 @@ class MoreArticleTagFragment : BaseFragment() {
 
         swipeRefreshLayout.isRefreshing = false
 
+    }
+
+
+    override fun onArticleTypeClicked(position: Int) {
+
+        val intent = Intent(context, TypeDetailActivity::class.java)
+
+        val bundle = Bundle()
+        bundle.putString(EXTRA_TYPE_TITLE, articleTypeList[position].articleTagData.name)
+        bundle.putParcelable(EXTRA_ARTICLE_TAG_DATA, articleTypeList[position].articleTagData)
+
+        intent.putExtras(bundle)
+        startActivity(intent)
     }
 
 }

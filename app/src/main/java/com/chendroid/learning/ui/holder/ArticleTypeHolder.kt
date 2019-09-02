@@ -19,7 +19,18 @@ import kotlinx.android.synthetic.main.holder_article_type_layout.view.*
  * @since 2019-08-21
  */
 @Layout(R.layout.holder_article_type_layout)
-class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagDataWrapper>(view), TagInnerMoreHolder.MoreTagListener {
+class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagDataWrapper>(view), TagInnerMoreHolder.MoreTagListener, View.OnClickListener {
+
+
+    interface ArticleTypeListener {
+        /**
+         * 类型被点击
+         * position 为它在 holder 里面的具体位置
+         */
+        fun onArticleTypeClicked(position: Int)
+    }
+
+    var articleTypeListener : ArticleTypeHolder.ArticleTypeListener? = null
 
     private val articleTypeView by lazy {
         itemView.article_type_title
@@ -40,6 +51,8 @@ class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagDataWrapper>(view), 
     }
 
     init {
+
+        itemView.setOnClickListener(this)
 
         initAdapter()
         initRecyclerView()
@@ -156,5 +169,14 @@ class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagDataWrapper>(view), 
 
         tagsList.addAll(data.articleTagData.children!!)
         tagsItemAdapter.notifyDataSetChanged()
+    }
+
+    override fun onClick(clickedView: View) {
+
+        // 被点击时，跳转到详细类型文章列表中
+
+        articleTypeListener?.run {
+            onArticleTypeClicked(adapterPosition)
+        }
     }
 }
