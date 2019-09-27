@@ -65,7 +65,6 @@ class TypeDetailActivity : BaseActivity() {
     override fun cancelRequest() {
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -166,7 +165,6 @@ class TypeDetailActivity : BaseActivity() {
 
         detailRecyclerView.adapter = detailSugarAdapter
         detailRecyclerView.addItemDecoration(StaggerItemDecoration.with(this))
-        updateDetailRecyclerBottomMargin()
 
         val baseDatas = BaseDatas(0, 2, "hyahhaha", 12, "chaptername", 1, "wwww.zhihu.com"
                 , "chendroid", 2, 1200, 3, 4, 4, "1234", 12, true)
@@ -190,24 +188,6 @@ class TypeDetailActivity : BaseActivity() {
         detailList.add(articleBaseDataWrapper)
 
         detailSugarAdapter.notifyDataSetChanged()
-    }
-
-    /**
-     * 更新 detailRecyclerView 的 bottomMargin 为 typeTagLayout 的 height
-     * 实际上修改的是 swipeRefreshLayout 的 bottomMargin
-     */
-    private fun updateDetailRecyclerBottomMargin() {
-
-        swipeRefreshLayout.post {
-            if (isFinishing) {
-                return@post
-            }
-//            val layoutParamsTemp = swipeRefreshLayout.layoutParams as ConstraintLayout.LayoutParams
-//            layoutParamsTemp.bottomMargin = typeTagLayout.height
-//            swipeRefreshLayout.layoutParams = layoutParamsTemp
-
-            swipeRefreshLayout.setPadding(0, 0, 0, typeTagLayout.height + toobarView.height + 32.dp)
-        }
     }
 
 }

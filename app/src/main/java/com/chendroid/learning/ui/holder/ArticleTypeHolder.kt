@@ -1,7 +1,9 @@
 package com.chendroid.learning.ui.holder
 
+import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import com.chendroid.learning.R
 import com.chendroid.learning.ui.holder.data.ArticleTagDataWrapper
@@ -30,7 +32,7 @@ class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagDataWrapper>(view), 
         fun onArticleTypeClicked(position: Int)
     }
 
-    var articleTypeListener : ArticleTypeHolder.ArticleTypeListener? = null
+    var articleTypeListener: ArticleTypeHolder.ArticleTypeListener? = null
 
     private val articleTypeView by lazy {
         itemView.article_type_title
@@ -70,6 +72,7 @@ class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagDataWrapper>(view), 
                 .add(TagInnerMoreHolder::class.java) { holder -> holder.moreTagListener = this }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initRecyclerView() {
 
         val layoutManager = FlexboxLayoutManager(context)
@@ -89,6 +92,9 @@ class ArticleTypeHolder(view: View) : SugarHolder<ArticleTagDataWrapper>(view), 
             this.layoutManager = layoutManager
             adapter = tagsItemAdapter
         }
+
+        // 设置该监听目的，使得 RecyclerView 不在拦截它的点击事件
+        articleTagRecyclerView.setOnTouchListener { _, event -> itemView.onTouchEvent(event) }
     }
 
     private fun updateArticleTagList() {
