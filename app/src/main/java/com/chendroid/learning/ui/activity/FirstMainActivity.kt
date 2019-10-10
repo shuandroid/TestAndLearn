@@ -1,5 +1,6 @@
 package com.chendroid.learning.ui.activity
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import com.chendroid.learning.R
@@ -56,5 +57,10 @@ class FirstMainActivity : BaseActivity() {
 
     override fun cancelRequest() {
 
+    }
+
+    override fun attachBaseContext(newBase: Context?) {
+        // 在这可修改 context
+        super.attachBaseContext(newBase)
     }
 }
