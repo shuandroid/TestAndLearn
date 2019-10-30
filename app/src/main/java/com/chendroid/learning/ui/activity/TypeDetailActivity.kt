@@ -3,9 +3,9 @@ package com.chendroid.learning.ui.activity
 import Constant.EXTRA_ARTICLE_TAG_DATA
 import Constant.EXTRA_TYPE_TITLE
 import android.os.Bundle
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.StaggeredGridLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.chendroid.learning.R
 import com.chendroid.learning.base.BaseActivity
 import com.chendroid.learning.bean.ArticleTagData
@@ -46,7 +46,7 @@ class TypeDetailActivity : BaseActivity() {
     }
 
     // 类型布局
-    private val typeTagLayout: RecyclerView by lazy {
+    private val typeTagLayout by lazy {
         type_tag_layout
     }
 
@@ -123,6 +123,7 @@ class TypeDetailActivity : BaseActivity() {
 
     /**
      * 设置文章类型的 layout
+     * 标签的自动换行布局实现
      */
     private fun setupTagLayout() {
         typeHolderBuilder.add(TagInnerHolder::class.java)
@@ -153,6 +154,7 @@ class TypeDetailActivity : BaseActivity() {
 
     /**
      * 设置文章详情列表 RecyclerView
+     * 瀑布流样式
      */
     private fun setupDetailRecyclerView() {
 
@@ -188,6 +190,11 @@ class TypeDetailActivity : BaseActivity() {
         detailList.add(articleBaseDataWrapper)
 
         detailSugarAdapter.notifyDataSetChanged()
+
+        val test = "haha"
+        if (test.isNotEmpty()) {
+            print("hahha")
+        }
     }
 
 }

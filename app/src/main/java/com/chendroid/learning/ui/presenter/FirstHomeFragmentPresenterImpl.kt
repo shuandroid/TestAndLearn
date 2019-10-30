@@ -1,6 +1,6 @@
 package com.chendroid.learning.ui.presenter
 
-import android.support.annotation.NonNull
+import androidx.annotation.NonNull
 import android.util.Log
 import com.chendroid.learning.bean.HomeBanner
 import com.chendroid.learning.bean.HomeListResponse

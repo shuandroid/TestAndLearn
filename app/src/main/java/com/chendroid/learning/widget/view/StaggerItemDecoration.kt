@@ -3,9 +3,9 @@ package com.chendroid.learning.widget.view
 import android.content.Context
 import android.graphics.Paint
 import android.graphics.Rect
-import android.support.annotation.IntRange
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.StaggeredGridLayoutManager
+import androidx.annotation.IntRange
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import android.view.View
 import com.chendroid.learning.R
 import com.zhihu.android.sugaradapter.SugarAdapter

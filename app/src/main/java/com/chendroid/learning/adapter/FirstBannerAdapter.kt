@@ -1,6 +1,6 @@
 package com.chendroid.learning.adapter
 
-import android.support.v4.view.PagerAdapter
+import androidx.viewpager.widget.PagerAdapter
 import android.view.View
 
 /**
@@ -8,7 +8,7 @@ import android.view.View
  * @author zhaochen @ Zhihu Inc.
  * @since  2019/1/8
  */
-class FirstBannerAdapter : PagerAdapter() {
+class FirstBannerAdapter : androidx.viewpager.widget.PagerAdapter() {
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
 
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

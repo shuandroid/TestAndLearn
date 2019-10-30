@@ -25,13 +25,13 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.support.annotation.ColorRes;
-import android.support.annotation.FloatRange;
-import android.support.annotation.IntRange;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import androidx.annotation.ColorRes;
+import androidx.annotation.FloatRange;
+import androidx.annotation.IntRange;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.viewpager.widget.ViewPager;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Interpolator;
@@ -42,7 +42,7 @@ import com.chendroid.learning.utils.DisplayUtils;
 import java.util.Arrays;
 
 /**
- * An ink inspired widget for indicating pages in a {@link android.support.v4.view.ViewPager}.
+ * An ink inspired widget for indicating pages in a {@link ViewPager}.
  * https://git.io/vAVrA
  */
 public class InkPageIndicator extends View implements ViewPager.OnPageChangeListener,

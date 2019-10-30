@@ -1,7 +1,7 @@
 package com.chendroid.learning.widget.view
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.MotionEvent
 
@@ -10,7 +10,7 @@ import android.view.MotionEvent
  * @author zhaochen @ Zhihu Inc.
  * @since  2019/4/22
  */
-class BannerRecyclerView : RecyclerView {
+class BannerRecyclerView :RecyclerView {
 
     constructor(context: Context) : this(context, null)
 

@@ -2,17 +2,16 @@ package com.chendroid.learning.ui.fragment
 
 import Constant.EXTRA_ARTICLE_TAG_DATA
 import Constant.EXTRA_TYPE_TITLE
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.chendroid.learning.R
 import com.chendroid.learning.base.BaseFragment
 import com.chendroid.learning.bean.ArticleTagData
@@ -78,7 +77,7 @@ class MoreArticleTagFragment : BaseFragment(), ArticleTypeHolder.ArticleTypeList
     private fun setupRecyclerView() {
         recyclerView = article_type_recycler
 
-        val verticalLayoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+        val verticalLayoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
 
         recyclerView.layoutManager = verticalLayoutManager
 

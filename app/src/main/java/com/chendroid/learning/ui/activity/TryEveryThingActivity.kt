@@ -1,13 +1,12 @@
 package com.chendroid.learning.ui.activity
 
 import android.os.Bundle
-import android.support.v4.view.AsyncLayoutInflater
-import android.support.v7.app.AppCompatActivity
+import androidx.asynclayoutinflater.view.AsyncLayoutInflater
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import com.chendroid.learning.R
-import com.chendroid.learning.base.BaseActivity
 
 /**
  * @intro 尝试所有的事情的界面
