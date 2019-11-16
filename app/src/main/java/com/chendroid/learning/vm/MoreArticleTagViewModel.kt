@@ -4,8 +4,12 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.chendroid.care.data.Result
 import com.chendroid.learning.bean.ArticleTagData
 import com.chendroid.learning.repository.ArticleTagDataSource
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 /**
  * @intro MoreArticleTagFragment 类对应的 vm 类，处理数据和逻辑
@@ -33,16 +37,27 @@ class MoreArticleTagViewModel(application: Application) : AndroidViewModel(appli
      * 刷新数据
      */
     fun refreshData() {
-        dataSource.getMoreArticleTreeList(object : ArticleTagDataSource.ArticleTagListCallback {
+//        dataSource.getMoreArticleTreeList(object : ArticleTagDataSource.ArticleTagListCallback {
+//
+//            override fun success(articleTagList: List<ArticleTagData>) {
+//
+//                loadDataSuccess.postValue(articleTagList)
+//            }
+//
+//            override fun error(errorMsg: String) {
+//                loadDataFailed.postValue(errorMsg)
+//            }
+//        })
 
-            override fun success(articleTagList: List<ArticleTagData>) {
+        GlobalScope.async {
+            val result = dataSource.getArticleDataByKt()
 
-                loadDataSuccess.postValue(articleTagList)
+            if (result is Result.Success) {
+                loadDataSuccess.postValue(result.data.data)
+            } else if (result is Result.Error) {
+                loadDataFailed.postValue(result.toString())
             }
+        }
 
-            override fun error(errorMsg: String) {
-                loadDataFailed.postValue(errorMsg)
-            }
-        })
     }
 }

@@ -4,7 +4,8 @@ import com.chendroid.learning.bean.HomeBanner
 import com.chendroid.learning.bean.HomeListResponse
 import com.chendroid.learning.bean.LoginResponse
 import com.chendroid.learning.bean.TagListResponse
-import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.Deferred
+import retrofit2.Response
 import retrofit2.http.*
 
 /**
@@ -35,6 +36,12 @@ interface WanAndroidService {
      */
     @GET("/tree/json")
     fun getArticleTypeList(): Deferred<TagListResponse>
+
+    /**
+     * 获取更多文章类型列表
+     */
+    @GET("/tree/json")
+    fun getArticleTypeListTestAsync(): Deferred<TagListResponse>
 
     /**
      * 获取类型下的文章列表

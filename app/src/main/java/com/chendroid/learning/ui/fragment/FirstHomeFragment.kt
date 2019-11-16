@@ -22,9 +22,7 @@ import com.chendroid.learning.ui.view.FirstHomeFragmentView
 import com.chendroid.learning.widget.view.BannerRecyclerView
 import com.zhihu.android.sugaradapter.SugarAdapter
 import kotlinx.android.synthetic.main.fragment_first_home_layout.*
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.*
 import toast
 
 /**
@@ -197,7 +195,9 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
             bannerSwitchJob = getBannerSwitchJob().apply { start() }
         }
     } ?: let {
-        bannerSwitchJob = getBannerSwitchJob().apply { start() }
+        bannerSwitchJob = getBannerSwitchJob().apply {
+            start()
+        }
     }
 
     private fun cancelSwitchJob() = bannerSwitchJob?.run {
@@ -207,7 +207,7 @@ class FirstHomeFragment : BaseFragment(), FirstHomeFragmentView, CollectArticleV
         }
     }
 
-    private fun getBannerSwitchJob() = launch {
+    private fun getBannerSwitchJob() = GlobalScope.launch {
         repeat(Int.MAX_VALUE) {
             if (bannerDataList.size == 0) {
                 return@launch

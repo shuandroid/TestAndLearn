@@ -2,7 +2,7 @@ package com.chendroid.learning.api
 
 import com.chendroid.learning.base.Preference
 import com.facebook.stetho.okhttp3.StethoInterceptor
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.experimental.CoroutineCallAdapterFactory
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import encodeCookie
 import loge
 import okhttp3.OkHttpClient

@@ -3,6 +3,7 @@ package com.chendroid.learning.ui.activity
 import android.content.Context
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.widget.LinearLayout
@@ -68,7 +69,8 @@ class ContentDetailActivity : BaseActivity() {
         }
     }
 
-    override fun onCreateView(name: String?, context: Context?, attrs: AttributeSet?): View? {
+    override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
+        Log.i("zctest", "onCreateView")
         return super.onCreateView(name, context, attrs)
     }
 

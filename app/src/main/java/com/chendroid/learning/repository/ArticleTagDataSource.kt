@@ -1,9 +1,14 @@
 package com.chendroid.learning.repository
 
+import com.chendroid.care.data.Result
+import com.chendroid.care.util.safeApiCall
 import com.chendroid.learning.api.ApiServiceHelper
 import com.chendroid.learning.bean.ArticleTagData
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
+import com.chendroid.learning.bean.TagListResponse
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import java.io.IOException
 
 /**
  * @intro MoreArticleTagFragment 的数据请求处理类
@@ -27,7 +32,7 @@ class ArticleTagDataSource {
     @SuppressWarnings("checkResult")
     fun getMoreArticleTreeList(callback: ArticleTagListCallback) {
 
-        async(UI) {
+        GlobalScope.async {
 
             val articleTypeList = ApiServiceHelper.wanAndroidService.getArticleTypeList()
             val result = articleTypeList.await()
@@ -53,9 +58,29 @@ class ArticleTagDataSource {
     /**
      * 获取类型下的文章列表
      */
-    fun getArticleList() {
+    fun getArticleList() = GlobalScope.launch {
+
 
     }
 
+
+    suspend fun getArticleDataByKt() = safeApiCall(
+            call = { requestArticleTag() },
+            errorMessage = "请求出错啦～～～"
+    )
+
+    private suspend fun requestArticleTag(): Result<TagListResponse> {
+
+        val responseTemp = ApiServiceHelper.wanAndroidService.getArticleTypeListTestAsync()
+
+        val response = responseTemp.await()
+
+        if (response.data != null) {
+
+            return Result.Success(response)
+        }
+
+        return Result.Error(IOException("error message error code is ${response.errorCode} and body is ${response.errorMsg}"))
+    }
 
 }
