@@ -139,7 +139,6 @@ class MoreArticleTagFragment : BaseFragment(), ArticleTypeHolder.ArticleTypeList
         }
 
         swipeRefreshLayout.isRefreshing = false
-
     }
 
 

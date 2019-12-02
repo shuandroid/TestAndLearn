@@ -31,7 +31,6 @@ class BannerHolder(view: View) : SugarHolder<HomeBanner.BannerItemData>(view), V
     }
 
     override fun onBindData(data: HomeBanner.BannerItemData) {
-        Log.e("zc_test", "BannerHolder  onBindData")
         if (!TextUtils.isEmpty(data.imagePath)) {
             Glide.with(context).load(data.imagePath).into(imageView)
         }

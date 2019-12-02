@@ -41,7 +41,7 @@ interface WanAndroidService {
      * 获取更多文章类型列表
      */
     @GET("/tree/json")
-    fun getArticleTypeListTestAsync(): Deferred<TagListResponse>
+    suspend fun getArticleTypeListTestAsync(): TagListResponse
 
     /**
      * 获取类型下的文章列表

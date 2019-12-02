@@ -1,6 +1,7 @@
 package com.chendroid.learning.repository
 
 import com.chendroid.care.data.Result
+import com.chendroid.care.data.Result.Success
 import com.chendroid.care.util.safeApiCall
 import com.chendroid.learning.api.ApiServiceHelper
 import com.chendroid.learning.bean.ArticleTagData
@@ -69,15 +70,12 @@ class ArticleTagDataSource {
             errorMessage = "请求出错啦～～～"
     )
 
-    private suspend fun requestArticleTag(): Result<TagListResponse> {
+    private suspend fun requestArticleTag(): Result<List<ArticleTagData>> {
 
-        val responseTemp = ApiServiceHelper.wanAndroidService.getArticleTypeListTestAsync()
-
-        val response = responseTemp.await()
+        val response = ApiServiceHelper.wanAndroidService.getArticleTypeListTestAsync()
 
         if (response.data != null) {
-
-            return Result.Success(response)
+            return Success(response.data!!)
         }
 
         return Result.Error(IOException("error message error code is ${response.errorCode} and body is ${response.errorMsg}"))
