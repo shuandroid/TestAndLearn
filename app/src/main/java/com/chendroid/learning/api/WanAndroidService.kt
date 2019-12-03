@@ -3,7 +3,9 @@ package com.chendroid.learning.api
 import com.chendroid.learning.bean.HomeBanner
 import com.chendroid.learning.bean.HomeListResponse
 import com.chendroid.learning.bean.LoginResponse
-import kotlinx.coroutines.experimental.Deferred
+import com.chendroid.learning.bean.TagListResponse
+import kotlinx.coroutines.Deferred
+import retrofit2.Response
 import retrofit2.http.*
 
 /**
@@ -28,6 +30,26 @@ interface WanAndroidService {
     @FormUrlEncoded
     fun loginWanAndroid(@Field("username") userName: String,
                         @Field("password") password: String): Deferred<LoginResponse>
+
+    /**
+     * 获取更多文章类型列表
+     */
+    @GET("/tree/json")
+    fun getArticleTypeList(): Deferred<TagListResponse>
+
+    /**
+     * 获取更多文章类型列表
+     */
+    @GET("/tree/json")
+    suspend fun getArticleTypeListTestAsync(): TagListResponse
+
+    /**
+     * 获取类型下的文章列表
+     * query cid 为该文章的类型标志
+     */
+    @GET("/article/list/{page}/json")
+    fun getArticleList(@Path("page") page: Int,
+                       @Query("cid") cid: Int)
 
 
 }

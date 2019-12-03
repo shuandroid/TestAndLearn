@@ -34,6 +34,9 @@
         </activity>
         <activity android:name=".ui.activity.FirstMainActivity" />
         <activity android:name=".ui.activity.ContentDetailActivity" />
+        <activity android:name=".ui.activity.TypeDetailActivity" />
+        <activity android:name=".ui.activity.TryEveryThingActivity" />
+        <activity android:name=".ui.activity.LoginAccountActivity" />
     </application>
 
 </manifest>

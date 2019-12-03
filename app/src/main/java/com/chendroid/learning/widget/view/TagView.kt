@@ -15,7 +15,8 @@ import dp
  * @author zhaochen @ Zhihu Inc.
  * @since  2019/7/30
  */
-class TagView constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+class TagView @JvmOverloads
+constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
         FrameLayout(context, attrs, defStyleAttr) {
 
     companion object {
@@ -42,7 +43,11 @@ class TagView constructor(context: Context, attrs: AttributeSet? = null, defStyl
     // tag 回答数量
     var answerCount: String?
     // tag 文本
-    var tagText: String?
+    var tagText: String? = ""
+        set(value) {
+            field = value
+            updateTagTextReal()
+        }
     // tag 背景
     private var tagBackground: Int
 

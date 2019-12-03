@@ -3,14 +3,12 @@ package com.chendroid.learning.model
 import android.util.Log
 import cancelByActive
 import com.chendroid.learning.api.ApiServiceHelper
-import com.chendroid.learning.api.Net
-import com.chendroid.learning.api.WanAndroidService
 import com.chendroid.learning.bean.HomeBanner
 import com.chendroid.learning.bean.HomeListResponse
 import com.chendroid.learning.ui.presenter.FirstHomePresenter
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import tryCatch
 
 /**
@@ -28,7 +26,7 @@ class HomeModelImpl : HomeModel {
 
     override fun getBanner(onBannerListener: FirstHomePresenter.OnBannerListener) {
 
-        async(UI) {
+        GlobalScope.async {
             tryCatch({
                 it.printStackTrace()
                 onBannerListener.getBannerFailed(it.toString())
@@ -55,7 +53,7 @@ class HomeModelImpl : HomeModel {
     // 获取文章列表
     override fun getHomeList(onHomeListListener: FirstHomePresenter.OnHomeListListener, page: Int) {
 
-        async(UI) {
+        GlobalScope.async {
             tryCatch({
                 it.printStackTrace()
                 Log.i("zc_test", "请求文章列表失败")

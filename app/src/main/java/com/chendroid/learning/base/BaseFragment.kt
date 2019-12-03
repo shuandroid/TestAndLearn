@@ -1,13 +1,13 @@
 package com.chendroid.learning.base
 
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 
 /**
  * @intro
  * @author zhaochen @ Zhihu Inc.
  * @since  2019/4/18
  */
-abstract class BaseFragment : Fragment() {
+abstract class BaseFragment : androidx.fragment.app.Fragment() {
 
 
     protected abstract fun cancelRequest()

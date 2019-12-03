@@ -1,6 +1,6 @@
 package com.chendroid.learning.ui.presenter
 
-import android.support.annotation.NonNull
+import androidx.annotation.NonNull
 import android.util.Log
 import com.chendroid.learning.bean.HomeBanner
 import com.chendroid.learning.bean.HomeListResponse
@@ -88,6 +88,8 @@ class FirstHomeFragmentPresenterImpl(
     }
 
     override fun getHomeListFailed(errorMessage: String?) {
+
+        Log.i("zc_test", "getHomeListFailed() 失败了哈哈哈")
         isLoadingArticleData = false
         homeFragmentView.getHomeListFailed(errorMessage)
     }

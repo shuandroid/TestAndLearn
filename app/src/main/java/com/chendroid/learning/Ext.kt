@@ -2,17 +2,16 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
-import android.support.annotation.LayoutRes
-import android.support.annotation.StringRes
+import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.just.agentweb.AgentWeb
-//import com.just.agentweb.ChromeClientCallbackManager
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.JobCancellationException
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Deferred
 
 /**
  * Log
@@ -114,7 +113,7 @@ fun Context.inflater(@LayoutRes resource: Int): View =
 inline fun tryCatch(catchBlock: (Throwable) -> Unit = {}, tryBlock: () -> Unit) {
     try {
         tryBlock()
-    } catch (_: JobCancellationException) {
+    } catch (_: CancellationException) {
 
     } catch (t: Throwable) {
         catchBlock(t)

@@ -1,14 +1,13 @@
 package com.chendroid.learning.ui.activity
 
+import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.TabLayout
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.chendroid.learning.R
-import com.chendroid.learning.api.ApiServiceHelper
 import com.chendroid.learning.base.BaseActivity
 import com.chendroid.learning.ui.adapter.FirstMainPagerAdapter
 import com.chendroid.learning.ui.fragment.FirstHomeFragment
-import com.chendroid.learning.ui.fragment.MoreTypeFragment
+import com.chendroid.learning.ui.fragment.MoreArticleTagFragment
 import kotlinx.android.synthetic.main.activity_first_main.*
 
 class FirstMainActivity : BaseActivity() {
@@ -24,11 +23,16 @@ class FirstMainActivity : BaseActivity() {
         initTabLayout()
     }
 
+    override fun initImmersionBar() {
+        super.initImmersionBar()
+        immersionBar.titleBar(R.id.toolbar).init()
+    }
+
     private fun initTabLayout() {
 //        main_tab_layout.tabMode = TabLayout.MODE_SCROLLABLE
 
         val firstHomeFragment = FirstHomeFragment()
-        val moreTypeFragment = MoreTypeFragment()
+        val moreTypeFragment = MoreArticleTagFragment()
 
         var tabTitleList = listOf<String>("首页", "更多")
 
@@ -37,7 +41,7 @@ class FirstMainActivity : BaseActivity() {
         main_view_pager.adapter = FirstMainPagerAdapter(tabTitleList, fragmentList, supportFragmentManager)
 //        main_tab_layout.setupWithViewPager(main_view_pager)
         main_tab_layout.setupWithViewPager(main_view_pager)
-        main_tab_layout.setTabIndicatorFullWidth(false)
+        main_tab_layout.isTabIndicatorFullWidth = false
     }
 
     private fun initViewPager() {
@@ -53,5 +57,10 @@ class FirstMainActivity : BaseActivity() {
 
     override fun cancelRequest() {
 
+    }
+
+    override fun attachBaseContext(newBase: Context?) {
+        // 在这可修改 context
+        super.attachBaseContext(newBase)
     }
 }

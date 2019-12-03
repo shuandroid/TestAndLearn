@@ -5,8 +5,14 @@ import android.os.Bundle
 import android.widget.Button
 import com.chendroid.learning.base.BaseActivity
 import com.chendroid.learning.ui.activity.FirstMainActivity
+import com.chendroid.learning.ui.activity.TryEveryThingActivity
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {
+
+    private val secondButton: Button by lazy {
+        second_learning_button
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,6 +23,14 @@ class MainActivity : BaseActivity() {
             startActivity(Intent(this, FirstMainActivity::class.java))
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        secondButton.setOnClickListener{
+            startActivity(Intent(this, TryEveryThingActivity::class.java))
+        }
     }
 
     override fun setLayoutId(): Int {

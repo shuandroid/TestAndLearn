@@ -2,7 +2,7 @@ package com.chendroid.learning.api
 
 import com.chendroid.learning.base.Preference
 import com.facebook.stetho.okhttp3.StethoInterceptor
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.experimental.CoroutineCallAdapterFactory
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import encodeCookie
 import loge
 import okhttp3.OkHttpClient
@@ -29,6 +29,7 @@ object ApiServiceHelper {
     private const val READ_TIMEOUT = 10L
 
     val wanAndroidService: WanAndroidService = ApiServiceHelper.getService(Constant.REQUEST_BASE_URL, WanAndroidService::class.java)
+    val newWanService = getService(Constant.REQUEST_BASE_URL, NewWanService::class.java)
 
     private fun create(url: String): Retrofit {
         val okHttpClientBuilder = OkHttpClient().newBuilder().apply {
