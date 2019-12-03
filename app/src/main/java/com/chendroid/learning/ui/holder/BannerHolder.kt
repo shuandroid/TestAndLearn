@@ -2,16 +2,17 @@ package com.chendroid.learning.ui.holder
 
 import Constant
 import android.content.Intent
+import android.graphics.Outline
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
-import com.bumptech.glide.Glide
+import android.view.ViewOutlineProvider
 import com.chendroid.learning.R
 import com.chendroid.learning.bean.HomeBanner
 import com.chendroid.learning.ui.activity.ContentDetailActivity
 import com.zhihu.android.sugaradapter.Layout
 import com.zhihu.android.sugaradapter.SugarHolder
+import dp
 import kotlinx.android.synthetic.main.holder_first_banner_home_layout.view.*
 
 /**
@@ -32,9 +33,16 @@ class BannerHolder(view: View) : SugarHolder<HomeBanner.BannerItemData>(view), V
 
     override fun onBindData(data: HomeBanner.BannerItemData) {
         if (!TextUtils.isEmpty(data.imagePath)) {
-            Glide.with(context).load(data.imagePath).into(imageView)
+            imageView.setImageURI(data.imagePath)
         }
 
+        itemView.outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: Outline) {
+                outline.setRoundRect(0, 0, view.width, view.height, 5.dp.toFloat())
+            }
+        }
+
+        itemView.clipToOutline = true
     }
 
     override fun onClick(clickView: View) {

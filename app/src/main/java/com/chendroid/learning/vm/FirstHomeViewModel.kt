@@ -1,5 +1,6 @@
 package com.chendroid.learning.vm
 
+import android.util.Log
 import androidx.annotation.UiThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,8 +13,9 @@ import com.chendroid.learning.bean.HomeBanner
 import com.chendroid.learning.data.repo.FirstHomeWanRepo
 import com.chendroid.learning.data.source.FirstHomeWanDataSource
 import com.chendroid.learning.data.usecase.GetBannerUseCase
+import com.chendroid.learning.ui.holder.EmptyBannerData
+import com.chendroid.learning.ui.holder.data.EmptyData
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -23,6 +25,10 @@ import kotlinx.coroutines.withContext
  * @since 2019-11-29
  */
 class FirstHomeViewModel : ViewModel() {
+
+    companion object {
+        const val TAG = "FirstHomeViewModel"
+    }
 
     private val _bannerUILD = MutableLiveData<List<HomeBanner.BannerItemData>>()
 
@@ -35,6 +41,14 @@ class FirstHomeViewModel : ViewModel() {
     // 文章的 live data
     val articleLD: LiveData<List<BaseDatas>>
         get() = vmArticleLD
+
+    val articleEmptyLD by lazy {
+        MutableLiveData<EmptyData>()
+    }
+
+    val bannerEmptyLD by lazy {
+        MutableLiveData<EmptyBannerData>()
+    }
 
     // 是否在拉去数据
     var isLoadingArticle = false
@@ -59,9 +73,12 @@ class FirstHomeViewModel : ViewModel() {
                 withContext(Main) {
                     emitUIBanner(result.data)
                 }
+            } else if (result is Result.Error) {
+                withContext(Main) {
+                    emitUIEmptyBanner()
+                }
             }
         }
-
     }
 
     /**
@@ -70,6 +87,10 @@ class FirstHomeViewModel : ViewModel() {
     @UiThread
     private fun emitUIBanner(banners: List<HomeBanner.BannerItemData>) {
         _bannerUILD.value = banners
+    }
+
+    private fun emitUIEmptyBanner() {
+        bannerEmptyLD.value = EmptyBannerData("头图 banner")
     }
 
     /**
@@ -88,7 +109,11 @@ class FirstHomeViewModel : ViewModel() {
                         emitUIArticleList(this@run)
                     }
                 }
-
+            } else if (result is Result.Error) {
+                withContext(Main) {
+                    Log.i("zc_test", "$TAG get artile error , mes is ${result.toString()}")
+                    emitUIArticleEmpty()
+                }
             }
         }
     }
@@ -100,6 +125,15 @@ class FirstHomeViewModel : ViewModel() {
     private fun emitUIArticleList(articleList: List<BaseDatas>) {
         isLoadingArticle = false
         vmArticleLD.value = articleList
+    }
+
+    /**
+     * 文章为空的界面
+     */
+    @UiThread
+    private fun emitUIArticleEmpty() {
+        isLoadingArticle = false
+        articleEmptyLD.value = EmptyData()
     }
 
 

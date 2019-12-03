@@ -15,11 +15,11 @@ import com.chendroid.learning.R
 import com.chendroid.learning.base.BaseFragment
 import com.chendroid.learning.bean.BaseDatas
 import com.chendroid.learning.bean.HomeBanner
-import com.chendroid.learning.bean.HomeListResponse
-import com.chendroid.learning.ui.holder.BannerHolder
-import com.chendroid.learning.ui.holder.HomeListBanner
+import com.chendroid.learning.ui.holder.*
+import com.chendroid.learning.ui.holder.data.EmptyData
 import com.chendroid.learning.vm.FirstHomeViewModel
 import com.chendroid.learning.widget.view.BannerRecyclerView
+import com.chendroid.learning.widget.view.CustomItemDecoration
 import com.zhihu.android.sugaradapter.SugarAdapter
 import kotlinx.android.synthetic.main.fragment_first_home_layout.*
 import kotlinx.coroutines.GlobalScope
@@ -39,12 +39,10 @@ class FirstHomeFragment : BaseFragment() {
     }
 
     // banner 的
-    private val bannerList: MutableList<HomeBanner.BannerItemData> = mutableListOf()
+    private val bannerList: MutableList<Any> = mutableListOf()
 
-    // 用来装载 home 请求的数据
-    private var homeResult: HomeListResponse? = null
     // 真正用来存在文章列表需要的数据
-    private val articleList: MutableList<BaseDatas> = mutableListOf()
+    private val articleList: MutableList<Any> = mutableListOf()
 
     private var holderBuilder: SugarAdapter.Builder = SugarAdapter.Builder.with(bannerList)
 
@@ -108,7 +106,9 @@ class FirstHomeFragment : BaseFragment() {
     init {
         // sugarBuilder 添加 SugarHolder
         holderBuilder.add(BannerHolder::class.java)
-        listHolderBuilder.add(HomeListBanner::class.java)
+                .add(EmptyBannerHolder::class.java)
+        listHolderBuilder.add(HomeListItemHolder::class.java)
+                .add(EmptyHolder::class.java)
     }
 
 
@@ -155,6 +155,8 @@ class FirstHomeFragment : BaseFragment() {
             layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
             adapter = homeListAdapter
             addOnScrollListener(articleListScrollListener)
+            // 设置 recyclerView item 分割条
+            addItemDecoration(CustomItemDecoration.with(context))
         }
 
         bindViewModel()
@@ -178,6 +180,12 @@ class FirstHomeFragment : BaseFragment() {
             home_swipe_refresh.isRefreshing = false
         }
 
+        val bannerEmptyLDObserver = Observer<EmptyBannerData> {
+            bannerList.add(it)
+            bannerAdapter.notifyDataSetChanged()
+            home_swipe_refresh.isRefreshing = false
+        }
+
         val articleListObserver = Observer<List<BaseDatas>> {
             articleList.addAll(it)
             Log.i("zc_test", "FirstHome Fragment getHomeListSuccess() datas is not null ")
@@ -185,9 +193,17 @@ class FirstHomeFragment : BaseFragment() {
             home_swipe_refresh.isRefreshing = false
         }
 
-        firstHomeVM.bannerUILD.observe(this, bannerLDObserver)
+        val articleEmptyAndErrorObserver = Observer<EmptyData> {
+            Log.i("zc_test", "FirstHome Fragment 空界面 ")
+            articleList.add(it)
+            homeListAdapter.notifyDataSetChanged()
+            home_swipe_refresh.isRefreshing = false
+        }
 
+        firstHomeVM.bannerUILD.observe(this, bannerLDObserver)
+        firstHomeVM.bannerEmptyLD.observe(this, bannerEmptyLDObserver)
         firstHomeVM.articleLD.observe(this, articleListObserver)
+        firstHomeVM.articleEmptyLD.observe(this, articleEmptyAndErrorObserver)
     }
 
     /**
@@ -196,6 +212,9 @@ class FirstHomeFragment : BaseFragment() {
     private fun loadData() {
         cancelSwitchJob()
         home_swipe_refresh.isRefreshing = true
+        // 清楚数据
+        bannerList.clear()
+        articleList.clear()
         firstHomeVM.run {
             getBannerData()
             getArticleList()

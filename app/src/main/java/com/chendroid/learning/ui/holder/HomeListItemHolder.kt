@@ -4,24 +4,20 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import com.chendroid.learning.R
 import com.chendroid.learning.bean.BaseDatas
-import com.chendroid.learning.bean.HomeListResponse
 import com.chendroid.learning.ui.activity.ContentDetailActivity
-import com.zhihu.android.sugaradapter.Id
 import com.zhihu.android.sugaradapter.Layout
 import com.zhihu.android.sugaradapter.SugarHolder
 import kotlinx.android.synthetic.main.layout_article_list_item.view.*
 
 /**
- * @intro
+ * @intro 文章列表的 item holder
  * @author zhaochen @ Zhihu Inc.
  * @since  2019/5/20
  */
 @Layout(R.layout.layout_article_list_item)
-class HomeListBanner(view: View) : SugarHolder<BaseDatas>(view), View.OnClickListener {
+class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClickListener {
 
     private val authorTextView by lazy {
         itemView.home_item_author
@@ -51,7 +47,7 @@ class HomeListBanner(view: View) : SugarHolder<BaseDatas>(view), View.OnClickLis
 
     override fun onBindData(data: BaseDatas) {
 
-        Log.i("zc_test", "HomeListBanner onBindData()")
+        Log.i("zc_test", "HomeListItemHolder onBindData()")
         authorTextView.text = data.author
         articleTitleView.text = data.title
         articleDateView.text = data.niceDate
@@ -69,9 +65,9 @@ class HomeListBanner(view: View) : SugarHolder<BaseDatas>(view), View.OnClickLis
             // 进入具体的文章界面
             Intent(context, ContentDetailActivity::class.java).run {
                 val bundle = Bundle()
-                bundle.putString(Constant.CONTENT_TITLE_KEY, this@HomeListBanner.data.title)
-                bundle.putString(Constant.CONTENT_URL_KEY, this@HomeListBanner.data.link)
-                bundle.putInt(Constant.CONTENT_ID_KEY, this@HomeListBanner.data.id)
+                bundle.putString(Constant.CONTENT_TITLE_KEY, this@HomeListItemHolder.data.title)
+                bundle.putString(Constant.CONTENT_URL_KEY, this@HomeListItemHolder.data.link)
+                bundle.putInt(Constant.CONTENT_ID_KEY, this@HomeListItemHolder.data.id)
                 putExtras(bundle)
                 context.startActivity(this)
             }

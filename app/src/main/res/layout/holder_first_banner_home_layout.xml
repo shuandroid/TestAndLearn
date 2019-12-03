@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="150dp">
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/home_banner_image"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:background="#100080"
+        android:scaleType="centerCrop"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
