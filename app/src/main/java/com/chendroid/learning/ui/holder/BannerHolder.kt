@@ -10,6 +10,7 @@ import android.view.ViewOutlineProvider
 import com.chendroid.learning.R
 import com.chendroid.learning.bean.HomeBanner
 import com.chendroid.learning.ui.activity.ContentDetailActivity
+import com.chendroid.learning.utils.ViewOutlineProviderUtils
 import com.zhihu.android.sugaradapter.Layout
 import com.zhihu.android.sugaradapter.SugarHolder
 import dp
@@ -36,13 +37,7 @@ class BannerHolder(view: View) : SugarHolder<HomeBanner.BannerItemData>(view), V
             imageView.setImageURI(data.imagePath)
         }
 
-        itemView.outlineProvider = object : ViewOutlineProvider() {
-            override fun getOutline(view: View, outline: Outline) {
-                outline.setRoundRect(0, 0, view.width, view.height, 5.dp.toFloat())
-            }
-        }
-
-        itemView.clipToOutline = true
+        ViewOutlineProviderUtils.setRoundCorner(itemView, 6.dp)
     }
 
     override fun onClick(clickView: View) {

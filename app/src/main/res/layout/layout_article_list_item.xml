@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/list_item_selector"
+    android:stateListAnimator="@animator/item_lift_on_touch"
     android:padding="10dp">
 
     <de.hdodenhof.circleimageview.CircleImageView

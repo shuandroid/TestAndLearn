@@ -15,9 +15,12 @@ import com.chendroid.learning.data.source.FirstHomeWanDataSource
 import com.chendroid.learning.data.usecase.GetBannerUseCase
 import com.chendroid.learning.ui.holder.EmptyBannerData
 import com.chendroid.learning.ui.holder.data.EmptyData
+import com.chendroid.learning.utils.ViewOutlineProviderUtils
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * @intro 首页的 ViewModel 处理数据类
@@ -45,8 +48,8 @@ class FirstHomeViewModel : ViewModel() {
     val articleEmptyLD by lazy {
         MutableLiveData<EmptyData>()
     }
-
     val bannerEmptyLD by lazy {
+
         MutableLiveData<EmptyBannerData>()
     }
 
@@ -66,9 +69,8 @@ class FirstHomeViewModel : ViewModel() {
      * 获取首页 banner 信息
      */
     fun getBannerData() {
-        viewModelScope.launch {
+        viewModelScope.launch(IO) {
             val result = getBannerUseCase.getWanAndroidBanner()
-
             if (result is Result.Success) {
                 withContext(Main) {
                     emitUIBanner(result.data)
@@ -99,8 +101,7 @@ class FirstHomeViewModel : ViewModel() {
     fun getArticleList(page: Int = 0) {
 
         isLoadingArticle = true
-
-        viewModelScope.launch {
+        viewModelScope.launch(IO) {
             val result = firstHomeWanRepo.getArticle(page)
 
             if (result is Result.Success) {
@@ -116,6 +117,7 @@ class FirstHomeViewModel : ViewModel() {
                 }
             }
         }
+
     }
 
     /**
