@@ -33,6 +33,7 @@ object TestSuspend {
     }
 
     suspend fun b() {
+        val test = "hahaa"
         println("b() start start start" + Thread.currentThread())
         coroutineScope {
             println("11111 线程 是" + Thread.currentThread())

@@ -16,10 +16,10 @@ import com.chendroid.learning.data.usecase.GetBannerUseCase
 import com.chendroid.learning.ui.holder.EmptyBannerData
 import com.chendroid.learning.ui.holder.data.EmptyData
 import com.chendroid.learning.utils.ViewOutlineProviderUtils
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.EmptyCoroutineContext
 
 /**
@@ -69,7 +69,12 @@ class FirstHomeViewModel : ViewModel() {
      * 获取首页 banner 信息
      */
     fun getBannerData() {
+
         viewModelScope.launch(IO) {
+
+            val job = coroutineContext[Job]
+            val continuationInterceptor = coroutineContext[ContinuationInterceptor]
+
             val result = getBannerUseCase.getWanAndroidBanner()
             if (result is Result.Success) {
                 withContext(Main) {
@@ -103,12 +108,15 @@ class FirstHomeViewModel : ViewModel() {
         isLoadingArticle = true
         viewModelScope.launch(IO) {
             val result = firstHomeWanRepo.getArticle(page)
-
+            delay(1000)
+            Log.i("zc_test", "11111 current thread is ${Thread.currentThread()}")
             if (result is Result.Success) {
                 result.data.datas?.run {
                     withContext(Main) {
+                        Log.i("zc_test", "22222 current thread is ${Thread.currentThread()}")
                         emitUIArticleList(this@run)
                     }
+                    Log.i("zc_test", "33333 current thread is ${Thread.currentThread()}")
                 }
             } else if (result is Result.Error) {
                 withContext(Main) {
@@ -117,7 +125,6 @@ class FirstHomeViewModel : ViewModel() {
                 }
             }
         }
-
     }
 
     /**
