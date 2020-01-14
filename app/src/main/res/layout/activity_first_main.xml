@@ -4,30 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context=".ui.activity.FirstMainActivity">
 
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <!--    <androidx.appcompat.widget.Toolbar-->
+    <!--        android:id="@+id/toolbar"-->
+    <!--        android:layout_width="0dp"-->
+    <!--        android:layout_height="56dp"-->
+    <!--        android:background="@color/colorPrimary"-->
+    <!--        android:fitsSystemWindows="true"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        app:titleTextColor="@android:color/white"-->
+    <!--        tools:text="@string/first_activity_title" />-->
+
+    <com.chendroid.learning.widget.view.HomeToolbar
+        android:id="@+id/home_toolbar"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:background="@color/colorPrimary"
         android:fitsSystemWindows="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleTextColor="@android:color/white"
-        tools:text="@string/first_activity_title" />
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <!-- support 升级到 28 后，可以使用原生的 TabLayout -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/main_tab_layout"
         android:layout_width="0dp"
         android:layout_height="36dp"
-        android:background="@color/colorPrimary"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintTop_toBottomOf="@+id/home_toolbar"
         app:tabIndicatorColor="@color/white"
         app:tabMode="scrollable"
         app:tabTextColor="@color/white" />
@@ -36,7 +46,6 @@
         android:id="@+id/main_view_pager"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -8,28 +8,27 @@ import com.chendroid.learning.base.BaseActivity
 import com.chendroid.learning.ui.adapter.FirstMainPagerAdapter
 import com.chendroid.learning.ui.fragment.FirstHomeFragment
 import com.chendroid.learning.ui.fragment.MoreArticleTagFragment
+import com.chendroid.learning.widget.view.HomeToolbar
 import kotlinx.android.synthetic.main.activity_first_main.*
 
+/**
+ * 主页
+ */
 class FirstMainActivity : BaseActivity() {
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        toolbar.run { title = getString(R.string.first_activity_title) }
-        initImmersionBar()
         initViewPager()
-
         initTabLayout()
+
+        initHomeToolbar()
+        //todo 添加用户信息的网络请求
     }
 
     override fun initImmersionBar() {
-        super.initImmersionBar()
-        immersionBar.titleBar(R.id.toolbar).init()
     }
 
     private fun initTabLayout() {
-//        main_tab_layout.tabMode = TabLayout.MODE_SCROLLABLE
 
         val firstHomeFragment = FirstHomeFragment()
         val moreTypeFragment = MoreArticleTagFragment()
@@ -39,16 +38,29 @@ class FirstMainActivity : BaseActivity() {
         var fragmentList = listOf<Fragment>(firstHomeFragment, moreTypeFragment)
 
         main_view_pager.adapter = FirstMainPagerAdapter(tabTitleList, fragmentList, supportFragmentManager)
-//        main_tab_layout.setupWithViewPager(main_view_pager)
         main_tab_layout.setupWithViewPager(main_view_pager)
         main_tab_layout.isTabIndicatorFullWidth = false
     }
 
     private fun initViewPager() {
 
-//        ApiServiceHelper
+    }
 
+    private fun initHomeToolbar() {
+        val homeToolbar = home_toolbar
 
+        homeToolbar.apply {
+            //
+
+            setToobarTitle("hahhaha")
+
+            homeToolbarListener = object : HomeToolbar.HomeToolbarListener {
+                override fun onAvatarViewClicked() {
+                    // todo 跳转
+
+                }
+            }
+        }
     }
 
     override fun setLayoutId(): Int {

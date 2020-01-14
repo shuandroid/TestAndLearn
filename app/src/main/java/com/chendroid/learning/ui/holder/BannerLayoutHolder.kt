@@ -92,7 +92,6 @@ class BannerLayoutHolder(view: View) : SugarHolder<AllBannerDataWrapper>(view), 
         data.bannerList?.run {
             bannerList.addAll(this)
             bannerAdapter.notifyDataSetChanged()
-
             startSwitchJob()
         }
 
@@ -140,18 +139,16 @@ class BannerLayoutHolder(view: View) : SugarHolder<AllBannerDataWrapper>(view), 
                     }
 
                     // 2 秒
-                    delay(2000)
+                    delay(3000)
 
                     currentIndex++
                     val index = currentIndex % size
-
                     recyclerView.smoothScrollToPosition(index)
                     currentIndex = index
                 }
             }
         }
     }
-
 
     override fun onViewDetachedFromWindow() {
         super.onViewDetachedFromWindow()

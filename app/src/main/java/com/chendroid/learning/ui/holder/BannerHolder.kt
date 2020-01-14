@@ -37,7 +37,7 @@ class BannerHolder(view: View) : SugarHolder<HomeBanner.BannerItemData>(view), V
             imageView.setImageURI(data.imagePath)
         }
 
-        ViewOutlineProviderUtils.setRoundCorner(itemView, 6.dp)
+//        ViewOutlineProviderUtils.setRoundCorner(itemView, 6.dp)
     }
 
     override fun onClick(clickView: View) {
