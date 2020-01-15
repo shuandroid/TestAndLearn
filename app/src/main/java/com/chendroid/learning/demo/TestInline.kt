@@ -1,5 +1,11 @@
 package com.chendroid.learning.demo
 
+import com.chendroid.learning.utils.ViewOutlineProviderUtils
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 
 /**
  * @intro 内联函数部分
@@ -7,14 +13,15 @@ package com.chendroid.learning.demo
  * @since 2019-10-23
  */
 
-fun main(args: Array<String>) {
-//    Log.i("zc_test", "main() start")
-    println("zc_test\", \"main() start")
-    val test = TestInline()
-    test.makeTest()
-//    Log.i("zc_test", "main() end")
-    test.lock(TestInline.TestLock()) { test.foo({ return print(it + "enenen") }, {}) }
-    println("zc_test\", \"main() end")
+suspend fun main(args: Array<String>) {
+////    Log.i("zc_test", "main() start")
+//    println("zc_test\", \"main() start")
+//    val test = TestInline()
+//    test.makeTest()
+////    Log.i("zc_test", "main() end")
+//    test.lock(TestInline.TestLock()) { test.foo({ return print(it + "enenen") }, {}) }
+//    println("zc_test\", \"main() end")
+
 }
 
 class TestInline() {

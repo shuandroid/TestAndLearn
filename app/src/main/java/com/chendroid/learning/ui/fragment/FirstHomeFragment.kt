@@ -8,24 +8,22 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.chendroid.learning.R
 import com.chendroid.learning.base.BaseFragment
 import com.chendroid.learning.bean.BaseDatas
 import com.chendroid.learning.bean.HomeBanner
-import com.chendroid.learning.ui.holder.*
+import com.chendroid.learning.ui.holder.BannerLayoutHolder
+import com.chendroid.learning.ui.holder.EmptyBannerData
+import com.chendroid.learning.ui.holder.EmptyHolder
+import com.chendroid.learning.ui.holder.HomeListItemHolder
+import com.chendroid.learning.ui.holder.data.AllBannerDataWrapper
 import com.chendroid.learning.ui.holder.data.EmptyData
 import com.chendroid.learning.vm.FirstHomeViewModel
-import com.chendroid.learning.widget.view.BannerRecyclerView
 import com.chendroid.learning.widget.view.CustomItemDecoration
 import com.zhihu.android.sugaradapter.SugarAdapter
 import kotlinx.android.synthetic.main.fragment_first_home_layout.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 /**
  * @intro 首页， wanandroid 网页的列表页和 banner 页
@@ -38,60 +36,22 @@ class FirstHomeFragment : BaseFragment() {
         private const val BANNER_TIME = 3000L
     }
 
-    // banner 的
-    private val bannerList: MutableList<Any> = mutableListOf()
-
     // 真正用来存在文章列表需要的数据
     private val articleList: MutableList<Any> = mutableListOf()
 
-    private var holderBuilder: SugarAdapter.Builder = SugarAdapter.Builder.with(bannerList)
 
     private var listHolderBuilder: SugarAdapter.Builder = SugarAdapter.Builder.with(articleList)
-
-    private val bannerDataList = mutableListOf<HomeBanner.BannerItemData>()
-
-    private val bannerAdapter by lazy {
-        holderBuilder.build()
-    }
 
     private val homeListAdapter by lazy {
         listHolderBuilder.build()
     }
 
-    private var bannerSwitchJob: Job? = null
-
-    private lateinit var bannerRecyclerView: BannerRecyclerView
-
     private lateinit var homeListRecyclerView: RecyclerView
 
     private lateinit var firstHomeVM: FirstHomeViewModel
 
-    // 当前 banner 的位置
-    private var currentIndex = 0
-
-    /**
-     * Banner PagerSnapHelper
-     */
-    private val bannerPagerSnap: PagerSnapHelper by lazy {
-        PagerSnapHelper()
-    }
-
     private val onRefreshListener = SwipeRefreshLayout.OnRefreshListener {
         refreshData()
-    }
-
-    //当是 悬停状态 idle 时，需要开启自动切换开关
-    private val onScrollListener = object : RecyclerView.OnScrollListener() {
-        // RecyclerView 的滚动监听
-        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-            super.onScrollStateChanged(recyclerView, newState)
-            when (newState) {
-                RecyclerView.SCROLL_STATE_IDLE -> {
-                    currentIndex = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                    startSwitchJob()
-                }
-            }
-        }
     }
 
     // 文章列表的滚动监听
@@ -104,32 +64,23 @@ class FirstHomeFragment : BaseFragment() {
     }
 
     init {
-        // sugarBuilder 添加 SugarHolder
-        holderBuilder.add(BannerHolder::class.java)
-                .add(EmptyBannerHolder::class.java)
         listHolderBuilder.add(HomeListItemHolder::class.java)
                 .add(EmptyHolder::class.java)
+                .add(BannerLayoutHolder::class.java)
     }
 
 
     // 取消网络请求
     override fun cancelRequest() {
-
-//        homeFragmentPresenter.cancelRequest()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val mainView = inflater.inflate(R.layout.fragment_first_home_layout, container, false)
-        bannerRecyclerView = mainView.findViewById(R.id.home_banner_recycler_view)!!
         homeListRecyclerView = mainView.findViewById(R.id.home_recycler_view)!!
         return mainView
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        cancelSwitchJob()
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -138,17 +89,6 @@ class FirstHomeFragment : BaseFragment() {
         home_swipe_refresh.apply {
             isRefreshing = true
             setOnRefreshListener(onRefreshListener)
-        }
-
-        bannerRecyclerView.apply {
-
-            layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
-
-            bannerPagerSnap.attachToRecyclerView(bannerRecyclerView)
-            // 事件拦截
-            requestDisallowInterceptTouchEvent(true)
-            addOnScrollListener(onScrollListener)
-            adapter = bannerAdapter
         }
 
         homeListRecyclerView.apply {
@@ -172,17 +112,15 @@ class FirstHomeFragment : BaseFragment() {
 
         // banner 成功的 监听
         val bannerLDObserver = Observer<List<HomeBanner.BannerItemData>> {
-            bannerList.addAll(it)
-            bannerDataList.addAll(it)
-            startSwitchJob()
-            bannerAdapter.notifyDataSetChanged()
-            //
+
+            val bannerDataWrapper = AllBannerDataWrapper(it, null, "来自网络数据源")
+            articleList.add(0, bannerDataWrapper)
+
             home_swipe_refresh.isRefreshing = false
         }
 
         val bannerEmptyLDObserver = Observer<EmptyBannerData> {
-            bannerList.add(it)
-            bannerAdapter.notifyDataSetChanged()
+            // todo
             home_swipe_refresh.isRefreshing = false
         }
 
@@ -210,10 +148,8 @@ class FirstHomeFragment : BaseFragment() {
      * 首次进入获取数据
      */
     private fun loadData() {
-        cancelSwitchJob()
         home_swipe_refresh.isRefreshing = true
         // 清楚数据
-        bannerList.clear()
         articleList.clear()
         firstHomeVM.run {
             getBannerData()
@@ -226,38 +162,6 @@ class FirstHomeFragment : BaseFragment() {
      */
     private fun refreshData() {
         loadData()
-    }
-
-    private fun startSwitchJob() = bannerSwitchJob?.run {
-        if (!isActive) {
-            bannerSwitchJob = getBannerSwitchJob().apply { start() }
-        }
-    } ?: let {
-        bannerSwitchJob = getBannerSwitchJob().apply {
-            start()
-        }
-    }
-
-    private fun cancelSwitchJob() = bannerSwitchJob?.run {
-
-        if (isActive) {
-            cancel()
-        }
-    }
-
-    private fun getBannerSwitchJob() = GlobalScope.launch {
-        repeat(Int.MAX_VALUE) {
-            if (bannerDataList.size == 0) {
-                return@launch
-            }
-
-            delay(BANNER_TIME)
-            currentIndex++
-            val index = currentIndex % bannerDataList.size
-
-            bannerRecyclerView.smoothScrollToPosition(index)
-            currentIndex = index
-        }
     }
 
     // 滚动时会调用该方法，去判断是否需要加载新的数据 loadMore

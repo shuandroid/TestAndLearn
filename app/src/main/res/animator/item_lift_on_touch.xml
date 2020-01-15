@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><!--当被按住时的动画-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <set>
+            <objectAnimator
+                android:duration="@android:integer/config_shortAnimTime"
+                android:propertyName="translationZ"
+                android:valueTo="4dp"
+                android:valueType="floatType" />
+
+        </set>
+    </item>
+    <item android:state_pressed="false">
+        <set>
+            <objectAnimator
+                android:duration="100"
+                android:propertyName="translationZ"
+                android:valueTo="0dp"
+                android:valueType="floatType" />
+        </set>
+
+    </item>
+
+</selector>

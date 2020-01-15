@@ -1,5 +1,6 @@
 package com.chendroid.learning.data.usecase
 
+import android.util.Log
 import com.chendroid.care.data.Result
 import com.chendroid.learning.api.ApiServiceHelper
 import com.chendroid.learning.bean.HomeBanner
@@ -23,7 +24,7 @@ class GetBannerUseCase {
      */
     suspend fun getWanAndroidBanner(): Result<List<HomeBanner.BannerItemData>> {
         val result = firstHomeRepo.getBanner()
-
+        Log.i("zc_test", "hahahha current thread is ${Thread.currentThread()}")
         return result
     }
 }

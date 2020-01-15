@@ -20,6 +20,9 @@ interface NewWanService {
     @GET("/banner/json")
     suspend fun getBanner(): Response<HomeBanner>
 
+    /**
+     * 获取文章列表
+     */
     @GET("/article/list/{page}/json")
     suspend fun getArticleList(@Path("page") page: Int): Response<HomeListResponse>
 

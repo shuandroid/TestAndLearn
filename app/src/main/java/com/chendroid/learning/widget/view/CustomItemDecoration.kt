@@ -50,7 +50,7 @@ class CustomItemDecoration private constructor(private val context: Context) : R
         for (i in 0 until parent.childCount) {
             val child = parent.getChildAt(i)
 
-            if (!isLastItem(child, parent)) {
+            if (!isLastItem(child, parent) && !isNoDividerItem(child, parent)) {
                 val params = child.layoutParams as RecyclerView.LayoutParams
                 val top = child.bottom - params.bottomMargin + child.translationY.roundToInt()
                 c.drawRect(left.toFloat(), top.toFloat(), right.toFloat(), (top + mDividerHeight).toFloat(), mPaint)
@@ -77,13 +77,22 @@ class CustomItemDecoration private constructor(private val context: Context) : R
         return false
     }
 
+    private fun isNoDividerItem(view: View, parent: RecyclerView): Boolean {
+        val childPosition = parent.getChildAdapterPosition(view)
+        if (childPosition == 0) {
+            return true
+        }
+
+        return false
+    }
+
 
     /**
      * 必须重写该方法，不然分割线占据的是 item 的空间位置
      */
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         super.getItemOffsets(outRect, view, parent, state)
-        if (!isLastItem(view, parent)) {
+        if (!isLastItem(view, parent) && !isNoDividerItem(view, parent)) {
             outRect.set(0, 0, 0, mDividerHeight)
         }
     }

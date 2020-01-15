@@ -10,7 +10,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
     protected lateinit var immersionBar: ImmersionBar
 
-
     private val imm: InputMethodManager by lazy {
         getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
@@ -34,7 +33,9 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        immersionBar.destroy()
+        immersionBar.run {
+            destroy()
+        }
         cancelRequest()
     }
 
