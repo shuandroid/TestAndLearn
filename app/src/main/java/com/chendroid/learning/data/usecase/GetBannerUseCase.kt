@@ -14,7 +14,6 @@ import com.chendroid.learning.data.source.FirstHomeWanDataSource
  */
 class GetBannerUseCase {
 
-
     private val firstHomeRepo by lazy {
         FirstHomeWanRepo(FirstHomeWanDataSource(ApiServiceHelper.newWanService))
     }

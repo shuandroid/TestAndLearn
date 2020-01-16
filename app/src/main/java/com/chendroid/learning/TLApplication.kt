@@ -1,6 +1,7 @@
 package com.chendroid.learning
 
 import android.app.Application
+import com.chendroid.learning.base.Preference
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.stetho.Stetho
 
@@ -17,6 +18,8 @@ class TLApplication : Application() {
         // 注册 Stetho inspector
         Stetho.initializeWithDefaults(this)
         Fresco.initialize(this)
+
+        Preference.setContext(applicationContext)
     }
 
 }

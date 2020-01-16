@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.chendroid.learning.R
 import com.chendroid.learning.base.BaseActivity
+import com.chendroid.learning.extension.openAccount
 import com.chendroid.learning.ui.adapter.FirstMainPagerAdapter
 import com.chendroid.learning.ui.fragment.FirstHomeFragment
 import com.chendroid.learning.ui.fragment.MoreArticleTagFragment
@@ -23,10 +24,12 @@ class FirstMainActivity : BaseActivity() {
 
         initHomeToolbar()
         //todo 添加用户信息的网络请求
+
+        initImmersionBar()
     }
 
-    override fun initImmersionBar() {
-    }
+//    override fun initImmersionBar() {
+//    }
 
     private fun initTabLayout() {
 
@@ -52,12 +55,12 @@ class FirstMainActivity : BaseActivity() {
         homeToolbar.apply {
             //
 
-            setToobarTitle("hahhaha")
+            setToolbarTitle("hahhaha")
 
             homeToolbarListener = object : HomeToolbar.HomeToolbarListener {
                 override fun onAvatarViewClicked() {
-                    // todo 跳转
-
+                    // 打开账号界面
+                    openAccount()
                 }
             }
         }

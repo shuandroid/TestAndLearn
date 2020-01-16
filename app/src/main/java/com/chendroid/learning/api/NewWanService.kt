@@ -2,10 +2,10 @@ package com.chendroid.learning.api
 
 import com.chendroid.learning.bean.HomeBanner
 import com.chendroid.learning.bean.HomeListResponse
+import com.chendroid.learning.bean.LoginResponse
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Path
+import retrofit2.http.*
 
 /**
  * @intron 新的 玩 Android 接口, 使用了 suspend 关键字
@@ -25,5 +25,14 @@ interface NewWanService {
      */
     @GET("/article/list/{page}/json")
     suspend fun getArticleList(@Path("page") page: Int): Response<HomeListResponse>
+
+
+    /**
+     * 登陆
+     */
+    @POST("/user/login")
+    @FormUrlEncoded
+    suspend fun loginAccount(@Field("username") username: String,
+                             @Field("password") password: String): Response<LoginResponse>
 
 }
