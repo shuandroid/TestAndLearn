@@ -20,10 +20,11 @@ class Preference<T>(private val name: String, private val default: T) : ReadWrit
          * init Context
          * @param context Context
          */
+        // todo  SP 文件名不行，尽可能分开，多个 SP 文件一起使用
         fun setContext(context: Context) {
             preferences = context.getSharedPreferences(
-                context.packageName + Constant.SHARED_NAME,
-                Context.MODE_PRIVATE
+                    context.packageName + Constant.SHARED_NAME,
+                    Context.MODE_PRIVATE
             )
         }
 

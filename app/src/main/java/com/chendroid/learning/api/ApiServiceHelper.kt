@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit
  */
 object ApiServiceHelper {
 
-
     private const val TAG = "RetrofitHelper"
     private const val CONTENT_PRE = "OkHttp: "
     private const val SAVE_USER_LOGIN_KEY = "user/login"
@@ -28,7 +27,7 @@ object ApiServiceHelper {
     private const val CONNECT_TIMEOUT = 30L
     private const val READ_TIMEOUT = 10L
 
-    val wanAndroidService: WanAndroidService = ApiServiceHelper.getService(Constant.REQUEST_BASE_URL, WanAndroidService::class.java)
+    val wanAndroidService: WanAndroidService = getService(Constant.REQUEST_BASE_URL, WanAndroidService::class.java)
     val newWanService = getService(Constant.REQUEST_BASE_URL, NewWanService::class.java)
 
     private fun create(url: String): Retrofit {
@@ -37,6 +36,9 @@ object ApiServiceHelper {
             connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
             readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
 
+            /**
+             * 添加拦截器，获取 cookie
+             */
             addInterceptor {
                 val request = it.request()
                 val response = it.proceed(request)
@@ -55,6 +57,26 @@ object ApiServiceHelper {
                 response
             }
 
+            /**
+             * 添加 cookie
+             */
+            addInterceptor {
+                val request = it.request()
+                val builder = request.newBuilder()
+                // 查看其域名是否
+                val domain = request.url().host()
+
+                // 为请求添加上 cookie
+                if (domain.isNotEmpty()) {
+                    val spCookie: String by Preference(domain, "")
+                    if (spCookie.isNotEmpty()) {
+                        builder.addHeader(COOKIE_NAME, spCookie)
+                    }
+                }
+
+                it.proceed(builder.build())
+            }
+
             // add log print
             if (Constant.INTERCEPTOR_ENABLE) {
                 // loggingInterceptor
@@ -66,7 +88,7 @@ object ApiServiceHelper {
                 })
             }
 
-            // 添加网络拦截
+            // 添加网络拦截， 用于 chrome 的 inspect
             addNetworkInterceptor(StethoInterceptor())
         }
 
@@ -97,7 +119,6 @@ object ApiServiceHelper {
         @Suppress("UNUSED_VALUE")
         spDomain = cookies
     }
-
 }
 
 

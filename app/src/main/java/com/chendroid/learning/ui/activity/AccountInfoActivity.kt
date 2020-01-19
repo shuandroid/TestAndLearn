@@ -1,21 +1,23 @@
 package com.chendroid.learning.ui.activity
 
-import android.content.Context
-import android.util.AttributeSet
+import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.chendroid.learning.R
 import com.chendroid.learning.base.BaseActivity
+import com.chendroid.learning.base.Preference
 import com.chendroid.learning.bean.LoginResponse
 import com.chendroid.learning.vm.AccountViewModel
 import com.facebook.drawee.view.SimpleDraweeView
 import kotlinx.android.synthetic.main.activity_account_info.*
 import kotlinx.android.synthetic.main.activity_login_layout.*
 import toast
+import java.lang.Exception
 
 /**
  * @intro 账号信息
@@ -33,13 +35,54 @@ class AccountInfoActivity : BaseActivity() {
     private lateinit var loginPasswordView: AppCompatEditText
     private lateinit var loginConfirmButton: Button
 
+    private lateinit var toolbar: Toolbar
+
     private lateinit var accountViewModel: AccountViewModel
+
+    /**
+     * 是否登陆
+     */
+    private var isLogin: Boolean by Preference(Constant.LOGIN_KEY, false)
+
+    /**
+     * 用户名字
+     */
+    private var username: String by Preference(Constant.USERNAME_KEY, "")
+
+    /**
+     * 密码
+     */
+    private var password: String by Preference(Constant.PASSWORD_KEY, "")
 
     override fun setLayoutId(): Int {
         return R.layout.activity_account_info
     }
 
     override fun cancelRequest() {
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        initToolbar()
+    }
+
+    /**
+     * 初始化 toolbar 相关信息
+     */
+    private fun initToolbar() {
+        toolbar = account_toolbar
+        toolbar.title = "账户"
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        toolbar.setOnClickListener {
+            finish()
+        }
+
+        toolbar.setNavigationOnClickListener {
+            finish()
+        }
     }
 
     override fun onResume() {
@@ -61,7 +104,7 @@ class AccountInfoActivity : BaseActivity() {
     private fun bindViewModel() {
         accountViewModel = ViewModelProviders.of(this).get(AccountViewModel::class.java)
 
-        // todo liveData 监听
+        // todo liveData 监听. 如果逻辑复杂的话，需要拆出来 Presenter  去处理这些逻辑
 
         val loginDataObserver = Observer<LoginResponse> {
             loginLayout.visibility = View.GONE
@@ -69,9 +112,24 @@ class AccountInfoActivity : BaseActivity() {
             it.data.icon?.run {
                 userAvatarView.setImageURI(this)
             }
+            saveLoginData(it.data)
+        }
+
+        val loginErrorObserver = Observer<Exception> {
+            toast("登陆失败，因为：${it.toString()}")
         }
 
         accountViewModel.loginDataLD.observe(this, loginDataObserver)
+        accountViewModel.loginErrorLD.observe(this, loginErrorObserver)
+    }
+
+    /**
+     * 保存登陆后的数据
+     */
+    private fun saveLoginData(resultData: LoginResponse.LoginData) {
+        isLogin = true
+        username = resultData.username
+        password = resultData.password
     }
 
     /**
@@ -84,7 +142,6 @@ class AccountInfoActivity : BaseActivity() {
         loginLayout = account_login_layout_root
         userNameView = account_user_name
         userAvatarView = account_user_avatar
-
         loginNameView = login_account_text
         loginPasswordView = login_password_text
         loginConfirmButton = login_confirm_button
@@ -93,6 +150,12 @@ class AccountInfoActivity : BaseActivity() {
     }
 
     private fun initNotLoginLayout() {
+
+        if (isLogin) {
+            loginLayout.visibility = View.GONE
+            userNameView.text = username
+            return
+        }
 
         loginConfirmButton.setOnClickListener {
             // 登陆

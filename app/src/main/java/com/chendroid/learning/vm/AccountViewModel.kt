@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 
 /**
  * @intro 有关账号的 viewModel 类
@@ -37,6 +38,16 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
     private val vmLoginDataLD = MutableLiveData<LoginResponse>()
 
     val loginDataLD: LiveData<LoginResponse> = vmLoginDataLD
+
+    /**
+     * 登陆失败
+     */
+    private val vmLoginErrorLD = MutableLiveData<Exception>()
+
+    /**
+     * 对外部暴露的 liveData
+     */
+    val loginErrorLD: LiveData<Exception> = vmLoginErrorLD
 
 
     /**
@@ -63,7 +74,7 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
             } else if (loginResult is Result.Error) {
                 Log.i("zc_test", "$TAG loginAccountReally() 失败")
                 withContext(Main) {
-
+                    vmLoginErrorLD.value = loginResult.exception
                 }
             }
 
