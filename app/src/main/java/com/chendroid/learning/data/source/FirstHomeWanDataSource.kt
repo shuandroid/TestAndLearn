@@ -63,7 +63,6 @@ class FirstHomeWanDataSource(private val wanService: NewWanService) {
         }
 
         return Result.Error(Exception("获取 banner 失败 error code ${articleResult.code()} error body is ${articleResult.errorBody()} "))
-
-
     }
+
 }

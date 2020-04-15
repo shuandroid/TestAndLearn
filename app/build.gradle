@@ -27,6 +27,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+//    buildFeatures {
+//        // 启动 viewBinding
+//        viewBinding = true
+//    }
+
 }
 
 configurations.all {

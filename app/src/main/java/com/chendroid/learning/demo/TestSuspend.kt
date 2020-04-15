@@ -1,9 +1,7 @@
 package com.chendroid.learning.demo
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlin.system.measureTimeMillis
 
 /**
  * @intro 测试 suspend 关键字和 coroutines
@@ -47,4 +45,42 @@ object TestSuspend {
 
         println("b() end end end" + Thread.currentThread())
     }
+
+    // 测试 async 协程的并发运行
+    suspend fun testAsync() {
+        coroutineScope {
+            val time = measureTimeMillis {
+                val one = async { doSomethingsOne() }
+                val two = async { doSomethingsTwo() }
+                println("the result is ${one.await() + two.await()}")
+            }
+
+            println("完成时间为 time is $time ms")
+        }
+    }
+
+    private suspend fun doSomethingsOne(): Int {
+        // 假设做了些事情，耗时
+        delay(1000L)
+        return 17
+    }
+
+    private suspend fun doSomethingsTwo(): Int {
+        // 假设做了些事情，耗时
+        delay(1000L)
+        return 30
+    }
+
+    private fun testString(str: String, m: Int) {
+
+        if (m >= str.length) {
+            return
+        }
+
+        for (c in str) {
+
+        }
+    }
+
+
 }

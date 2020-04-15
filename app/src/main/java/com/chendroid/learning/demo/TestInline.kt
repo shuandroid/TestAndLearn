@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
  * @since 2019-10-23
  */
 
-suspend fun main(args: Array<String>) {
+ fun main(args: Array<String>) {
 ////    Log.i("zc_test", "main() start")
 //    println("zc_test\", \"main() start")
 //    val test = TestInline()
@@ -21,6 +21,8 @@ suspend fun main(args: Array<String>) {
 ////    Log.i("zc_test", "main() end")
 //    test.lock(TestInline.TestLock()) { test.foo({ return print(it + "enenen") }, {}) }
 //    println("zc_test\", \"main() end")
+
+
 
 }
 

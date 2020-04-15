@@ -19,6 +19,8 @@ class FirstMainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        layoutInflater.toString()
+
         initViewPager()
         initTabLayout()
 

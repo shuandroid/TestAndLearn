@@ -1,9 +1,9 @@
 package com.chendroid.learning.api
 
+import com.chendroid.learning.bean.CollectArticleResponse
 import com.chendroid.learning.bean.HomeBanner
 import com.chendroid.learning.bean.HomeListResponse
 import com.chendroid.learning.bean.LoginResponse
-import kotlinx.coroutines.Deferred
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -34,5 +34,19 @@ interface NewWanService {
     @FormUrlEncoded
     suspend fun loginAccount(@Field("username") username: String,
                              @Field("password") password: String): Response<LoginResponse>
+
+    /**
+     * 收藏或者取消收藏文章
+     */
+    @POST("/lg/collect/{article_id}/json")
+    suspend fun collectArticle(@Path("article_id") articleId: String): Response<CollectArticleResponse>
+
+    // todo FormUrlEncoded 的作用
+    /**
+     * 取消收藏文章
+     */
+    @POST("/lg/uncollect/{article_id}/json")
+    @FormUrlEncoded
+    suspend fun unCollectArticle(@Path("article_id") articleId: String, @Field("originId") originId: Int = -1): Response<CollectArticleResponse>
 
 }

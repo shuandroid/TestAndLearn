@@ -119,6 +119,10 @@ object ApiServiceHelper {
         @Suppress("UNUSED_VALUE")
         spDomain = cookies
     }
+
+    private fun savaCookies() {
+
+    }
 }
 
 
