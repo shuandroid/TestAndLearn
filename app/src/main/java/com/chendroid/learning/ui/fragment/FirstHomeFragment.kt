@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -153,10 +154,10 @@ class FirstHomeFragment : BaseFragment(), HomeListItemHolder.HomeItemListener {
             home_swipe_refresh.isRefreshing = false
         }
 
-        firstHomeVM.bannerUILD.observe(this, bannerLDObserver)
-        firstHomeVM.bannerEmptyLD.observe(this, bannerEmptyLDObserver)
-        firstHomeVM.articleLD.observe(this, articleListObserver)
-        firstHomeVM.articleEmptyLD.observe(this, articleEmptyAndErrorObserver)
+        firstHomeVM.bannerUILD.observe(viewLifecycleOwner, bannerLDObserver)
+        firstHomeVM.bannerEmptyLD.observe(viewLifecycleOwner, bannerEmptyLDObserver)
+        firstHomeVM.articleLD.observe(viewLifecycleOwner, articleListObserver)
+        firstHomeVM.articleEmptyLD.observe(viewLifecycleOwner, articleEmptyAndErrorObserver)
     }
 
     /**

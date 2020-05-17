@@ -4,10 +4,7 @@ import android.app.Application
 import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.UiThread
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.chendroid.care.data.Result
 import com.chendroid.learning.api.ApiServiceHelper
 import com.chendroid.learning.bean.BaseDatas
@@ -65,12 +62,27 @@ class FirstHomeViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
 
+    val testData: LiveData<List<BaseDatas>> = liveData {
+
+        val result = firstHomeWanRepo.getArticle()
+        if (result is Result.Success) {
+//            emitSource()
+            emit(result.data.datas!!)
+        }
+    }
+
+    val bannerTest: LiveData<List<HomeBanner.BannerItemData>> = liveData(IO) {
+        val result = getBannerUseCase.getWanAndroidBanner()
+        if (result is Result.Success) {
+            emit(result.data)
+        }
+    }
+
+
     /**
      * 获取首页 banner 信息
      */
     fun getBannerData() {
-
-        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
         viewModelScope.launch(IO) {
             val result = getBannerUseCase.getWanAndroidBanner()

@@ -1,5 +1,6 @@
 package com.chendroid.learning.ui.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -13,9 +14,11 @@ import com.chendroid.learning.base.BaseActivity
 import com.chendroid.learning.base.Preference
 import com.chendroid.learning.bean.LoginResponse
 import com.chendroid.learning.vm.AccountViewModel
+import com.chendroid.learning.widget.view.TagView
 import com.facebook.drawee.view.SimpleDraweeView
 import kotlinx.android.synthetic.main.activity_account_info.*
 import kotlinx.android.synthetic.main.activity_login_layout.*
+import kotlinx.android.synthetic.main.activity_todo.*
 import toast
 import java.lang.Exception
 
@@ -53,6 +56,8 @@ class AccountInfoActivity : BaseActivity() {
      * 密码
      */
     private var password: String by Preference(Constant.PASSWORD_KEY, "")
+
+    private lateinit var todoTagView: TagView
 
     override fun setLayoutId(): Int {
         return R.layout.activity_account_info
@@ -147,6 +152,8 @@ class AccountInfoActivity : BaseActivity() {
         loginConfirmButton = login_confirm_button
 
         initNotLoginLayout()
+
+        initAccountView()
     }
 
     private fun initNotLoginLayout() {
@@ -166,6 +173,15 @@ class AccountInfoActivity : BaseActivity() {
                 return@setOnClickListener
             }
             accountViewModel.loginAccount(username, password)
+        }
+    }
+
+    private fun initAccountView() {
+        todoTagView = account_todo
+
+        todoTagView.setOnClickListener {
+            // 跳转到 我的 to`do 界面
+            startActivity(Intent(this, TodoActivity::class.java))
         }
     }
 
