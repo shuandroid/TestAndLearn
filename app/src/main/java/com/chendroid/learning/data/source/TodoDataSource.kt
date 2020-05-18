@@ -14,7 +14,7 @@ import java.lang.Exception
  */
 class TodoDataSource(private val wanService: NewWanService) {
 
-    suspend fun getAllTodoType(@IntRange(from = 1) pageNum: Int = 1): Result<TodoData> {
+    suspend fun getAllTodoType(@IntRange(from = 1) pageNum: Int = 1, queryMap: Map<String, Int>? = null): Result<TodoData> {
 
         return safeApiCall(
                 call = {
