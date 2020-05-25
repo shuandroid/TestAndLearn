@@ -58,6 +58,6 @@ interface NewWanService {
      * 例如：「/lg/todo/v2/list/{1}/json?status=0&orderby=1&type=」
      */
     @GET("/lg/todo/v2/list/{page_num}/json")
-    suspend fun getTodoList(@Path("page_num") @IntRange(from = 1) pageNum: Int, @QueryMap queryMap: Map<String, String>? = null): Response<TodoData>
+    suspend fun getTodoList(@Path("page_num") @IntRange(from = 1) pageNum: Int, @QueryMap queryMap: Map<String, Int>? = null): Response<TodoData>
 
 }

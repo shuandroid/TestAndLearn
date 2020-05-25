@@ -6,7 +6,7 @@ package com.chendroid.learning.bean
  * @since 2020/5/15
  */
 data class TodoData(
-        val todoDataList: TodoDataList,
+        val data: TodoDataList,
         val errorCode: Int,
         val errorMsg: String
 ) {
@@ -17,13 +17,13 @@ data class TodoData(
     data class TodoBaseData(
             val completeDate: Long,
             val completeDateStr: String,
-            val content: String,
+            val content: String?,
             val date: Long,
             val dateStr: String,
             val id: Int,
             val priority: Int,
             val status: Int,
-            val title: String,
+            val title: String?,
             val type: Int,
             val userId: Int
     )

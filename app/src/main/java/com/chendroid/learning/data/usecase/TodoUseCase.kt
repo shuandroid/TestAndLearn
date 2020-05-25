@@ -1,11 +1,13 @@
 package com.chendroid.learning.data.usecase
 
+import android.util.Log
 import androidx.annotation.IntDef
 import androidx.annotation.IntRange
 import com.chendroid.care.data.Result
 import com.chendroid.learning.api.ApiServiceHelper
 import com.chendroid.learning.bean.TodoData
 import com.chendroid.learning.data.source.TodoDataSource
+import java.lang.Exception
 
 
 /**
@@ -33,24 +35,24 @@ class TodoUseCase() {
         // 生活
         const val TYPE_TODO_LIFE = 3
         // 默认
-        const val TYPE_TODO_DEFAULT = 4
+        const val TYPE_TODO_DEFAULT = 0
     }
 
     // to·do 列表的类型
     @Retention(AnnotationRetention.SOURCE)
+    @Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
     @IntDef(
-        TYPE_TODO_JOB,
-        TYPE_TODO_LEARN,
-        TYPE_TODO_LIFE,
-        TYPE_TODO_DEFAULT)
+            TYPE_TODO_JOB,
+            TYPE_TODO_LEARN,
+            TYPE_TODO_LIFE,
+            TYPE_TODO_DEFAULT)
     annotation class TodoType {
     }
-
 
     /**
      * 获取完成的 to'do 列表
      */
-    suspend fun getTodoListFinished(pageNum: Int, @TodoType type: Int = 1, orderBy: Int = 4): Result<TodoData> {
+    suspend fun getTodoListFinished(pageNum: Int, @TodoType type: Int = 0, orderBy: Int = 4): Result<TodoData> {
 
         val queryMap = mutableMapOf<String, Int>()
 
@@ -65,12 +67,12 @@ class TodoUseCase() {
     /**
      * 获取未完成的 to'do 列表
      */
-    suspend fun getTodoListDoing(pageNum: Int, type: Int = 1, orderBy: Int = 4): Result<TodoData> {
+    suspend fun getTodoListDoing(pageNum: Int, @TodoType type: Int = 0, orderBy: Int = 4): Result<TodoData> {
 
         val queryMap = mutableMapOf<String, Int>()
         // 0 表示未完成
         queryMap["status"] = 0
-        queryMap["type"] = type
+//        queryMap["type"] = type
         queryMap["orderby"] = orderBy
 
         return getTodoListReally(pageNum, queryMap)
@@ -80,9 +82,17 @@ class TodoUseCase() {
     private suspend fun getTodoListReally(@IntRange(from = 1) pageNum: Int = 1, queryMap: Map<String, Int>): Result<TodoData> {
 
         val result = todoDataSource.getAllTodoType(pageNum, queryMap)
+        Log.i("zc_test", "getTodoListReally is here result is $result")
+        if (result is Result.Success) {
+            val resultData = result.data
+            resultData.data?.datas?.run {
+                // 数据成功
+                return result
+            }
+            return Result.Error(Exception("后端下发失败 error is  ${resultData.errorCode}, and error msg is ${resultData.errorMsg}"))
+        }
 
-
-        return result
+        return Result.Error(Exception("网络失败"))
     }
 
 

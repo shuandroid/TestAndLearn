@@ -4,20 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context=".ui.activity.TodoActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/todo_toolbar"
         android:layout_width="0dp"
         android:layout_height="56dp"
+        android:background="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleTextColor="@color/white" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/todo_tab_layout"
         android:layout_width="0dp"
         android:layout_height="36dp"
+        android:background="@color/colorPrimary"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/todo_toolbar"
@@ -25,7 +29,7 @@
         app:tabMode="scrollable"
         app:tabTextColor="@color/white" />
 
-    <androidx.viewpager.widget.ViewPager
+    <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/todo_view_pager"
         android:layout_width="0dp"
         android:layout_height="0dp"

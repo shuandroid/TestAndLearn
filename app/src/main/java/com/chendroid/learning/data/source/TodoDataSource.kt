@@ -1,5 +1,6 @@
 package com.chendroid.learning.data.source
 
+import android.util.Log
 import androidx.annotation.IntRange
 import com.chendroid.care.data.Result
 import com.chendroid.care.util.safeApiCall
@@ -18,15 +19,17 @@ class TodoDataSource(private val wanService: NewWanService) {
 
         return safeApiCall(
                 call = {
-                    getAllTodoTypeReal(pageNum)
+                    getAllTodoTypeReal(pageNum, queryMap)
                 },
                 errorMessage = "todo 失败")
     }
 
 
-    private suspend fun getAllTodoTypeReal(pageNum: Int, queryMap: Map<String, String>? = null): Result<TodoData> {
+    private suspend fun getAllTodoTypeReal(pageNum: Int, queryMap: Map<String, Int>? = null): Result<TodoData> {
 
         val response = wanService.getTodoList(pageNum, queryMap)
+
+        Log.i("zc_test", response.message() + response.toString())
 
         if (response.isSuccessful) {
             val body = response.body()

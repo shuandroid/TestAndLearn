@@ -26,6 +26,12 @@ class CustomItemDecoration private constructor(private val context: Context) : R
     private val mDividerColorRes: Int
     private val padding: Int = 0
 
+    // 第一个是否显示分割条，默认为 false ，不显示
+    var isFirstShowDecoration = false
+
+    // 最后一个是否显示分割条，默认为 false ，不显示
+    var isLastShowDecoration = false
+
     init {
         mPaint.style = Paint.Style.FILL
         mDividerColorRes = R.color.f6f6f6
@@ -64,11 +70,14 @@ class CustomItemDecoration private constructor(private val context: Context) : R
         }
     }
 
-
     /**
      * 是否是最后一个 item
      */
     private fun isLastItem(view: View, parent: RecyclerView): Boolean {
+        if (isLastShowDecoration) {
+            return false
+        }
+
         val childPosition = parent.getChildAdapterPosition(view)
         if (childPosition + 1 == (parent.adapter as SugarAdapter).itemCount) {
             // 是最后一个 item
@@ -77,8 +86,16 @@ class CustomItemDecoration private constructor(private val context: Context) : R
         return false
     }
 
+    /**
+     * 第一个不展示分割条
+     */
     private fun isNoDividerItem(view: View, parent: RecyclerView): Boolean {
+
+        if (isFirstShowDecoration) {
+            return false
+        }
         val childPosition = parent.getChildAdapterPosition(view)
+        // 第一个不展示分割条
         if (childPosition == 0) {
             return true
         }

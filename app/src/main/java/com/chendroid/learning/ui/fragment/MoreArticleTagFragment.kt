@@ -88,7 +88,7 @@ class MoreArticleTagFragment : BaseFragment(), ArticleTypeHolder.ArticleTypeList
         articleTypeAdapter = typeListBuilder.build()
 
         recyclerView.adapter = articleTypeAdapter
-        recyclerView.addItemDecoration(CustomItemDecoration.with(context!!))
+        recyclerView.addItemDecoration(CustomItemDecoration.with(context!!).apply { isFirstShowDecoration = true })
 
         recyclerView.addOnScrollListener(articleListScrollListener)
     }
