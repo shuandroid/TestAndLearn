@@ -71,7 +71,7 @@ class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClic
         }
         articleTitleView.text = data.title
         articleDateView.text = data.niceDate
-        articleTypeView.text = data.chapterName
+        articleTypeView.tagText = data.chapterName
 
         if (data.collect) {
             //收藏了该文章 todo
@@ -168,7 +168,7 @@ class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClic
         //
         homeItemListener?.run {
             if (data.collect) {
-                onCollectViewClicked(data.id, data.originId,  data.collect) { isSuccess -> handleUnCollectArticleResult(isSuccess) }
+                onCollectViewClicked(data.id, data.originId, data.collect) { isSuccess -> handleUnCollectArticleResult(isSuccess) }
             } else {
                 onCollectViewClicked(data.id, data.originId, data.collect) { isSuccess -> handleCollectArticleResult(isSuccess) }
             }

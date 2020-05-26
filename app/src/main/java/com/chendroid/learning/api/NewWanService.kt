@@ -60,4 +60,10 @@ interface NewWanService {
     @GET("/lg/todo/v2/list/{page_num}/json")
     suspend fun getTodoList(@Path("page_num") @IntRange(from = 1) pageNum: Int, @QueryMap queryMap: Map<String, Int>? = null): Response<TodoData>
 
+
+    @POST("/lg/todo/add/json")
+    @FormUrlEncoded
+    suspend fun addNewTodo(@Field("title") title: String, @Field("content") content: String,
+                           @Field("type") type: Int): Response<CollectArticleResponse>
+
 }

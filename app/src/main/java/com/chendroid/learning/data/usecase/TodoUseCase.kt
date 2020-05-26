@@ -26,6 +26,11 @@ class TodoUseCase() {
 
     private val todoDataSource = TodoDataSource(ApiServiceHelper.newWanService)
 
+    // 存储请求到的数据， 内存缓存，不需要再次请求
+    private val allTodoListResult: Result<TodoData>? = null
+
+    // 缓存的 map
+    private val todoResultMap: MutableMap<Int, Result<TodoData>?> = mutableMapOf()
 
     companion object {
         // to·do 类型工作
@@ -53,7 +58,6 @@ class TodoUseCase() {
      * 获取完成的 to'do 列表
      */
     suspend fun getTodoListFinished(pageNum: Int, @TodoType type: Int = 0, orderBy: Int = 4): Result<TodoData> {
-
         val queryMap = mutableMapOf<String, Int>()
 
         // 1 表示完成
@@ -61,32 +65,40 @@ class TodoUseCase() {
         queryMap["type"] = type
         queryMap["orderby"] = orderBy
 
-        return getTodoListReally(pageNum, queryMap)
+        return getTodoListReally(pageNum, type, queryMap)
     }
 
     /**
      * 获取未完成的 to'do 列表
+     * forceNeedRefresh 是否必须请求数据，默认为 true； 如果为 false, 且 todoResultMap 中有混存数据，则不去网络请求获取数据
      */
-    suspend fun getTodoListDoing(pageNum: Int, @TodoType type: Int = 0, orderBy: Int = 4): Result<TodoData> {
+    suspend fun getTodoListDoing(pageNum: Int, @TodoType type: Int = 0, orderBy: Int = 4, forceNeedRefresh: Boolean = true): Result<TodoData> {
+
+        if (!forceNeedRefresh) {
+            todoResultMap[type]?.run {
+                return this
+            }
+        }
 
         val queryMap = mutableMapOf<String, Int>()
         // 0 表示未完成
         queryMap["status"] = 0
-//        queryMap["type"] = type
+        queryMap["type"] = type
         queryMap["orderby"] = orderBy
 
-        return getTodoListReally(pageNum, queryMap)
+        return getTodoListReally(pageNum, type, queryMap)
     }
 
     // 设计成多中请求的情况
-    private suspend fun getTodoListReally(@IntRange(from = 1) pageNum: Int = 1, queryMap: Map<String, Int>): Result<TodoData> {
+    private suspend fun getTodoListReally(@IntRange(from = 1) pageNum: Int = 1, @TodoType type: Int = 0, queryMap: Map<String, Int>): Result<TodoData> {
 
         val result = todoDataSource.getAllTodoType(pageNum, queryMap)
         Log.i("zc_test", "getTodoListReally is here result is $result")
         if (result is Result.Success) {
             val resultData = result.data
             resultData.data?.datas?.run {
-                // 数据成功
+                // 数据成功, 则添加进入 map 中
+                todoResultMap[type] = result
                 return result
             }
             return Result.Error(Exception("后端下发失败 error is  ${resultData.errorCode}, and error msg is ${resultData.errorMsg}"))

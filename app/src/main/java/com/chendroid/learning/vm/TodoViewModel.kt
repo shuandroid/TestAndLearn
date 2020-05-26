@@ -30,7 +30,7 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
     fun getDoingTodoList(pageNum: Int = 1) {
 
         viewModelScope.launch(IO) {
-            val result = todoUseCase.getTodoListDoing(pageNum)
+            val result = todoUseCase.getTodoListDoing(pageNum, forceNeedRefresh = false)
             if (result is Result.Success) {
                 // 这里成功了，必然是有数据的
                 val resultData = result.data.data.datas
@@ -45,6 +45,28 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
+    /**
+     * 根据类型，进行筛选不同的数据
+     */
+    fun getDoingTodoListByType(pageNum: Int = 1, typeNumber: Int) {
+        viewModelScope.launch(IO) {
+            val result = todoUseCase.getTodoListDoing(pageNum, typeNumber, forceNeedRefresh = false)
+            if (result is Result.Success) {
+                // 这里成功了，必然是有数据的
+                val resultData = result.data.data.datas
+                resultData?.run {
+                    withContext(Main) {
+                        todoListLiveData.value = this@run
+                    }
+                }
+            } else if (result is Result.Error) {
+                // 失败了 todo 暂时处理
+                Log.i("zc_test", result.toString())
+            }
+        }
+    }
+
 
     fun getDoneTodoList(pageNum: Int = 1) {
 

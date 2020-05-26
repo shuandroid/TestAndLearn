@@ -5,10 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.chendroid.learning.R
 import com.chendroid.learning.base.BaseFragment
 import com.chendroid.learning.bean.TodoData
@@ -27,6 +29,14 @@ class DetailTodoDoingFragment : BaseFragment() {
 
 
     private lateinit var recyclerView: RecyclerView
+
+    private lateinit var swipeRefresh: SwipeRefreshLayout
+
+    private lateinit var type1: TextView
+    private lateinit var type2: TextView
+    private lateinit var type3: TextView
+    private lateinit var type4: TextView
+
 
     // 数据源列表
     private val todoList = mutableListOf<TodoData.TodoBaseData>()
@@ -47,7 +57,6 @@ class DetailTodoDoingFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         return inflater.inflate(R.layout.fragment_todo_detail_layout, container, false)
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,44 +70,97 @@ class DetailTodoDoingFragment : BaseFragment() {
 
     private fun setupTypeView(view: View) {
 
-        val type1 = view.todo_type_1
+        type1 = view.todo_type_1
         type1.apply {
             background.alpha = (0.08 * 255).toInt()
             setOnClickListener {
-//                it.background = resources.getDrawable(R.drawable.tag_selected_bg)
-//                type1.setTextColor(resources.getColor(R.color.white))
-
-
+                handleTypeViewClick(0)
             }
         }
 
-        val type2 = view.todo_type_2
+        type2 = view.todo_type_2
         type2.apply {
             background.alpha = (0.08 * 255).toInt()
             setOnClickListener {
-
+                handleTypeViewClick(1)
             }
         }
 
 
-        val type3 = view.todo_type_3
+        type3 = view.todo_type_3
         type3.apply {
             background.alpha = (0.08 * 255).toInt()
             setOnClickListener {
-
+                handleTypeViewClick(2)
             }
         }
 
-        val type4 = view.todo_type_4
+        type4 = view.todo_type_4
         type4.apply {
             background.alpha = (0.08 * 255).toInt()
             setOnClickListener {
-
+                handleTypeViewClick(3)
             }
         }
     }
 
+    private fun handleTypeViewClick(typeNumber: Int) {
+        when (typeNumber) {
+            0 -> {
+                makeViewSelected(type1)
+                makeViewNormal(type2)
+                makeViewNormal(type3)
+                makeViewNormal(type4)
+            }
+            1 -> {
+                makeViewSelected(type2)
+                makeViewNormal(type1)
+                makeViewNormal(type3)
+                makeViewNormal(type4)
+            }
+            2 -> {
+                makeViewSelected(type3)
+                makeViewNormal(type2)
+                makeViewNormal(type1)
+                makeViewNormal(type4)
+            }
+            3 -> {
+                makeViewSelected(type4)
+                makeViewNormal(type2)
+                makeViewNormal(type3)
+                makeViewNormal(type1)
+            }
+        }
+        reloadDataByType(typeNumber)
+    }
+
+    /**
+     * 设置成正常状态
+     */
+    private fun makeViewNormal(view: TextView) {
+        view.apply {
+            background.alpha = (0.08 * 255).toInt()
+            setTextColor(resources.getColor(R.color.GBL01A))
+            isEnabled = true
+        }
+    }
+
+    /**
+     * 设置成被选中状态
+     */
+    private fun makeViewSelected(view: TextView) {
+        view.apply {
+            background.alpha = 255
+            setTextColor(resources.getColor(R.color.white))
+            // 防止多次点击
+            isEnabled = false
+        }
+    }
+
     private fun setupRecyclerView(view: View) {
+
+        swipeRefresh = view.todo_swipe_refresh
+
         recyclerView = view.todo_recycler_view
 
 
@@ -118,13 +180,21 @@ class DetailTodoDoingFragment : BaseFragment() {
             Log.i("zc_test", "todoViewModel.todoListLiveData 成功")
             todoList.addAll(it)
             adapter.notifyDataSetChanged()
+            swipeRefresh.isRefreshing = false
         })
     }
 
     private fun loadData() {
 
+        swipeRefresh.isRefreshing = true
         todoList.clear()
         todoViewModel.getDoingTodoList(1)
+    }
+
+    private fun reloadDataByType(typeNumber: Int) {
+        swipeRefresh.isRefreshing = true
+        todoList.clear()
+        todoViewModel.getDoingTodoListByType(1, typeNumber)
     }
 
 }
