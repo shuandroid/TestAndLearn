@@ -8,6 +8,7 @@ import com.chendroid.learning.base.BaseActivity
 import com.chendroid.learning.ui.adapter.TodoViewPager2Adapter
 import com.chendroid.learning.ui.fragment.DetailTodoFinishedFragment
 import com.chendroid.learning.ui.fragment.DetailTodoDoingFragment
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.activity_todo.*
 
@@ -20,6 +21,7 @@ class TodoActivity : BaseActivity() {
 
     private lateinit var toolbar: Toolbar
 
+    private lateinit var fabTodoView: FloatingActionButton
 
     override fun setLayoutId(): Int {
         return R.layout.activity_todo
@@ -30,11 +32,23 @@ class TodoActivity : BaseActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+//        val exit = Materialc
+
         super.onCreate(savedInstanceState)
 
+        initView()
         initToolbar()
         initViewPager()
         initImmersionBar()
+    }
+
+    private fun initView() {
+        fabTodoView = add_todo_button
+
+        fabTodoView.setOnClickListener {
+            // 点击新增。 todo 增加 transform 动画
+        }
     }
 
     /**

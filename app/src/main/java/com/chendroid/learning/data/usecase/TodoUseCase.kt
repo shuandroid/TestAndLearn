@@ -108,4 +108,11 @@ class TodoUseCase() {
     }
 
 
+    suspend fun addNewTodo(title: String, content: String, todoType: Int) {
+
+        val result = todoDataSource.addNewTodo(title, content, todoType)
+        Log.i("zc_test", "addNewTodo result is $result")
+    }
+
+
 }

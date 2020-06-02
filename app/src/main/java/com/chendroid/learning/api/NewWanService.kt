@@ -64,6 +64,6 @@ interface NewWanService {
     @POST("/lg/todo/add/json")
     @FormUrlEncoded
     suspend fun addNewTodo(@Field("title") title: String, @Field("content") content: String,
-                           @Field("type") type: Int): Response<CollectArticleResponse>
+                           @Field("type") type: Int): Response<TodoResponseData>
 
 }

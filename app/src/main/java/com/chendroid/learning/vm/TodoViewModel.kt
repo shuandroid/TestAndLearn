@@ -87,5 +87,11 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun addNewTodo() {
+
+        viewModelScope.launch(IO) {
+            todoUseCase.addNewTodo("学习线程池", "线程之间的交互，观察者模式", 2)
+        }
+    }
 
 }

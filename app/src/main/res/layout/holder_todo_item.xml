@@ -30,7 +30,7 @@
         android:textSize="15sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/item_title"
-        tools:text="内容" />
+        tools:text="内容hahhahahahhahahahhahahhahahhahahahhahahahahhahahahhahahahah" />
 
     <TextView
         android:id="@+id/item_date"

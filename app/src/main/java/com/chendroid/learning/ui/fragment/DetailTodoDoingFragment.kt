@@ -86,7 +86,6 @@ class DetailTodoDoingFragment : BaseFragment() {
             }
         }
 
-
         type3 = view.todo_type_3
         type3.apply {
             background.alpha = (0.08 * 255).toInt()
@@ -104,6 +103,9 @@ class DetailTodoDoingFragment : BaseFragment() {
         }
     }
 
+    /**
+     * 处理 type 种类按钮被点击
+     */
     private fun handleTypeViewClick(typeNumber: Int) {
         when (typeNumber) {
             0 -> {
@@ -117,6 +119,8 @@ class DetailTodoDoingFragment : BaseFragment() {
                 makeViewNormal(type1)
                 makeViewNormal(type3)
                 makeViewNormal(type4)
+
+                todoViewModel.addNewTodo()
             }
             2 -> {
                 makeViewSelected(type3)
