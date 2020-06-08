@@ -59,7 +59,6 @@ class HomeToolbar @JvmOverloads constructor(context: Context, attrs: AttributeSe
         toolbarTitle.text = title
     }
 
-
     override fun onClick(clickedView: View) {
 
         if (clickedView === avatarImageView) {
