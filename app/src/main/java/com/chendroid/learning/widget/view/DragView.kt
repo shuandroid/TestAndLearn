@@ -240,5 +240,8 @@ class DragView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         super.onDraw(canvas)
     }
 
+    override fun performClick(): Boolean {
+        return super.performClick()
+    }
 
 }

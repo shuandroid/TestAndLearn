@@ -1,4 +1,4 @@
-package com.chendroid.learning.utils
+package com.chendroid.learning.utils.cache
 
 import java.util.*
 
@@ -24,22 +24,22 @@ object LastReadCacheUtils {
      *  添加正在看的文章 id
      */
     @JvmStatic
-    fun addAnswerId(currentAnswerId: Long) {
+    fun addAiticleId(currentArticleId: Long) {
 
         // 要先判断是否有和 currentAnswerId 重复的值， 有的话，则去除掉
         for (id: Long in lastArticleList) {
-            if (id == currentAnswerId) {
+            if (id == currentArticleId) {
                 lastArticleList.remove(id)
                 break
             }
         }
 
-        // 比较是否大于默认值，如果大于，则 poll 最先加入的值
+        // 比较是否大于默认值，如果大于，则 remove 最先加入的值
         if (lastArticleList.size > LAST_READ_ARTICLE_MAX_DEFAULT) {
-            lastArticleList.poll()
+            lastArticleList.removeFirst()
         }
         // 添加进去新的浏览值
-        lastArticleList.offer(currentAnswerId)
+        lastArticleList.offer(currentArticleId)
     }
 
 

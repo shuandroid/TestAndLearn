@@ -1,6 +1,8 @@
 package com.chendroid.learning.ui.activity
 
 import android.os.Bundle
+import android.util.Log
+import android.view.MotionEvent
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.chendroid.learning.R
@@ -91,6 +93,11 @@ class TodoActivity : BaseActivity() {
                 .attach()
 
         todo_tab_layout.isTabIndicatorFullWidth = false
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        Log.i("zc_test", "todo activity dispatchTouchEvent ${ev.action}")
+        return super.dispatchTouchEvent(ev)
     }
 
 }
