@@ -1,6 +1,7 @@
 package com.chendroid.learning.utils.cache
 
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * @intro 最近浏览的数据缓存工具类
@@ -42,6 +43,10 @@ object LastReadCacheUtils {
         lastArticleList.offer(currentArticleId)
     }
 
+
+
+    val list1 = ArrayList<Int>()
+    val list2 = ArrayList<Int>(20)
 
 
 
