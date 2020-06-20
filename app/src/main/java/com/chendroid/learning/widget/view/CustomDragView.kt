@@ -3,6 +3,7 @@ package com.chendroid.learning.widget.view
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.util.Log
@@ -11,18 +12,22 @@ import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.dynamicanimation.animation.DynamicAnimation
+import androidx.dynamicanimation.animation.SpringAnimation
+import androidx.dynamicanimation.animation.SpringForce
 import com.chendroid.learning.R
 import com.chendroid.learning.utils.ViewOutlineProviderUtils
+import com.facebook.drawee.view.SimpleDraweeView
 import dp
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 /**
- * @intro 随手指拖动而动的 View 控件
+ * @intro
  * @author zhaochen@ZhiHu Inc.
- * @since 2020/6/8
+ * @since 2020/6/17
  */
-class DragView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
+class CustomDragView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
     : ConstraintLayout(context, attrs, defStyleAttr) {
 
 
@@ -53,17 +58,24 @@ class DragView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
     private var screenWidth: Float
 
+    /**
+     * 原始的位置
+     */
+    private var originPositionX = 0F
+    private var originPositionY = 0F
+
+    // 头像 view
+    private lateinit var avatarView: SimpleDraweeView
+
     init {
 
         screenWidth = resources.displayMetrics.widthPixels.toFloat()
 
         // 初始化 view
-        val innerView = LayoutInflater.from(context).inflate(R.layout.view_drag_add_layout, this, true)
+        val innerView = LayoutInflater.from(context).inflate(R.layout.custom_drag_view_layout, this, true)
+        avatarView = innerView.findViewById(R.id.avatar_icon_view)
 
-        // 设置圆角背景
-        ViewOutlineProviderUtils.setRoundCorner(this, 32.dp)
         apply {
-            elevation = 4.dp.toFloat()
             isClickable = true
         }
     }
@@ -73,6 +85,16 @@ class DragView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         // do nothing
 
         parentViewMaxHeight = (parent as ViewGroup).height.toFloat()
+
+        // 获取原始 view 的位置
+        originPositionX = x
+        originPositionY = y
+    }
+
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+
+
     }
 
     /**
@@ -156,16 +178,15 @@ class DragView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 val deltaY = event.rawY - mPrevY
                 mCurX = mFirstX + deltaX
                 mCurY = mFirstY + deltaY
-
                 handleViewWhenOverScreen()
-                x = mCurX
-                y = mCurY
+
+                moveViewByDrag()
             }
 
             MotionEvent.ACTION_POINTER_UP,
             MotionEvent.ACTION_UP -> if (isFirstFingerTouch(event)) {
                 // 移动该 view
-                moveViewToEdge()
+                resetView()
                 isFirstMove = true
                 mIsCanMove = false
                 if (mScrolling) {
@@ -176,6 +197,29 @@ class DragView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         }
 
         return super.onTouchEvent(event)
+    }
+
+    private fun moveViewByDrag() {
+        // 移动 view x, y 的坐标
+        x = mCurX
+        y = mCurY
+
+        // todo 设置其他部分实现
+
+    }
+
+    /**
+     *  重置 view
+     */
+    private fun resetView() {
+
+        // SpringForce 不能使用同一个，不然，finalPosition 会被覆盖掉
+        val springX = SpringAnimation(this, DynamicAnimation.X).setSpring(SpringForce().setDampingRatio(SpringForce.DAMPING_RATIO_HIGH_BOUNCY).setStiffness(SpringForce.STIFFNESS_MEDIUM))
+        val springY = SpringAnimation(this, DynamicAnimation.Y).setSpring(SpringForce().setDampingRatio(SpringForce.DAMPING_RATIO_HIGH_BOUNCY).setStiffness(SpringForce.STIFFNESS_MEDIUM))
+
+        Log.i("zc_test", "spring test animate originPositionX is $originPositionX, and originPositionY is  $originPositionY")
+        springX.animateToFinalPosition(originPositionX)
+        springY.animateToFinalPosition(originPositionY)
     }
 
     /**
@@ -212,33 +256,18 @@ class DragView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         return event.getPointerId(event.actionIndex) == 0
     }
 
-    /**
-     * 移动 NextAnswerAnimationView 到可显示区域的边缘
-     */
-    private fun moveViewToEdge() {
-        Log.i("zc_test", "moveViewToEdge()")
 
-        val destX: Int = if (x + width / 2 > screenWidth / 2) {
-            (screenWidth - width - 10.dp).toInt()
-        } else {
-            10.dp
-        }
-        animate().translationXBy(destX - x).setDuration(200)
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        if (context == null) {
-                            return
-                        }
-                    }
-                })
-    }
+    private fun fetchBitmap() {
 
-    override fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas)
-    }
+        val bitmap = Bitmap.createBitmap(avatarView.width, avatarView.height, Bitmap.Config.ARGB_8888)
 
-    override fun performClick(): Boolean {
-        return super.performClick()
+        val locationOfViewInWindow = IntArray(2)
+        avatarView.getLocationInWindow(locationOfViewInWindow)
+
+
+
+
+
     }
 
 }

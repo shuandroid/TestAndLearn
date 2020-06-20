@@ -81,13 +81,12 @@ class AccountInfoActivity : BaseActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        toolbar.setOnClickListener {
-            finish()
-        }
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
 
         toolbar.setNavigationOnClickListener {
             finish()
         }
+
     }
 
     override fun onResume() {
