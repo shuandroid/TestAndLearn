@@ -97,8 +97,8 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
         parentViewMaxHeight = (parent as ViewGroup).height.toFloat()
 
         // 获取原始 view 的位置
-        originPositionX = avatarView.x
-        originPositionY = avatarView.y
+        originPositionX = x
+        originPositionY = y
     }
 
     override fun onFinishInflate() {
@@ -112,9 +112,9 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
      */
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
 
-        if (!inAvatarViewInterval(event)) {
-            return super.onInterceptTouchEvent(event)
-        }
+//        if (!inAvatarViewInterval(event)) {
+////            return super.onInterceptTouchEvent(event)
+////        }
 
         //如果不支持拖拽，则不拦截
         // delta 为移动的距离
@@ -145,9 +145,9 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
     override fun onTouchEvent(event: MotionEvent): Boolean {
 
 ////        // 如果不再头像区域，则不拦截
-        if (!inAvatarViewInterval(event)) {
-            return super.onTouchEvent(event)
-        }
+//        if (!inAvatarViewInterval(event)) {
+//            return super.onTouchEvent(event)
+//        }
 
         val delta: Int
 
@@ -176,8 +176,8 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
 
                 if (isFirstMove) {
 //                    Log.i("zc_test", "onTouchEvent() isFirstMove is true ")
-                    mFirstX = avatarView.x
-                    mFirstY = avatarView.y
+                    mFirstX = x
+                    mFirstY = y
                     mPrevX = event.rawX
                     mPrevY = event.rawY
                     isFirstMove = false
@@ -209,10 +209,11 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
 
     private fun moveViewByDrag() {
         // 移动 view x, y 的坐标 设置为对应的 avatar view
-        avatarView.x = mCurX
-        avatarView.y = mCurY
-
-        invalidate()
+        // 头像的位置
+//        avatarView.x = mCurX
+//        avatarView.y = mCurY
+        x = mCurX
+        y = mCurY
     }
 
     /**
@@ -261,8 +262,8 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
     private fun resetView() {
 
         // SpringForce 不能使用同一个，不然，finalPosition 会被覆盖掉
-        val springX = SpringAnimation(avatarView, DynamicAnimation.X).setSpring(SpringForce().setDampingRatio(SpringForce.DAMPING_RATIO_HIGH_BOUNCY).setStiffness(SpringForce.STIFFNESS_MEDIUM))
-        val springY = SpringAnimation(avatarView, DynamicAnimation.Y).setSpring(SpringForce().setDampingRatio(SpringForce.DAMPING_RATIO_HIGH_BOUNCY).setStiffness(SpringForce.STIFFNESS_MEDIUM))
+        val springX = SpringAnimation(this, DynamicAnimation.X).setSpring(SpringForce().setDampingRatio(SpringForce.DAMPING_RATIO_HIGH_BOUNCY).setStiffness(SpringForce.STIFFNESS_MEDIUM))
+        val springY = SpringAnimation(this, DynamicAnimation.Y).setSpring(SpringForce().setDampingRatio(SpringForce.DAMPING_RATIO_HIGH_BOUNCY).setStiffness(SpringForce.STIFFNESS_MEDIUM))
 
         Log.i("zc_test", "spring test animate originPositionX is $originPositionX, and originPositionY is  $originPositionY")
         springX.animateToFinalPosition(originPositionX)
@@ -279,8 +280,8 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
         }
 
         // Y 轴下边界
-        if (mCurY > parentViewMaxHeight - avatarView.height) {
-            mCurY = parentViewMaxHeight - avatarView.height
+        if (mCurY > parentViewMaxHeight - height) {
+            mCurY = parentViewMaxHeight - height
         }
 
         // X 轴左边界
@@ -289,8 +290,8 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
         }
 
         // X 轴右边界
-        if (mCurX > screenWidth - 10.dp - avatarView.width) {
-            mCurX = screenWidth - 10.dp - avatarView.width
+        if (mCurX > screenWidth - 10.dp - width) {
+            mCurX = screenWidth - 10.dp - width
         }
     }
 
@@ -303,16 +304,17 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
         return event.getPointerId(event.actionIndex) == 0
     }
 
+    // todo 这种方式不行，不能为全屏的 view ,会遮挡被覆盖 view 的点击事件。另想其他的方式
     override fun dispatchDraw(canvas: Canvas?) {
         super.dispatchDraw(canvas)
 //
         Log.i("zc_test", "dispatchDraw hahhahah")
-        if (mScrolling) {
-            canvas?.run {
-                Log.i("zc_test", "dispatchDraw hahhahah drawBitmap")
-//                drawBitmap(targetBitmap, 0F, 0F, bitmapPaint)
-            }
-        }
+//        if (mScrolling) {
+//            canvas?.run {
+//                Log.i("zc_test", "dispatchDraw hahhahah drawBitmap")
+////                drawBitmap(targetBitmap, 0F, 0F, bitmapPaint)
+//            }
+//        }
     }
 
 }
