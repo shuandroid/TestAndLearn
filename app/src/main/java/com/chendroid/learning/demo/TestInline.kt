@@ -23,7 +23,15 @@ import kotlinx.coroutines.launch
 //    println("zc_test\", \"main() end")
 
 
+    println("class is " + Test123::class.java)
 
+    val test = Test123()
+
+    println("class is 实例是：  " + test::class.java)
+
+}
+
+class Test123() {
 }
 
 class TestInline() {

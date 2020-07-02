@@ -1,10 +1,15 @@
 package com.chendroid.learning.ui.activity
 
+import Constant
 import android.content.Intent
+import android.graphics.Bitmap
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
@@ -13,14 +18,14 @@ import com.chendroid.learning.R
 import com.chendroid.learning.base.BaseActivity
 import com.chendroid.learning.base.Preference
 import com.chendroid.learning.bean.LoginResponse
+import com.chendroid.learning.utils.ViewUtils
 import com.chendroid.learning.vm.AccountViewModel
+import com.chendroid.learning.widget.view.CustomDragView
 import com.chendroid.learning.widget.view.TagView
 import com.facebook.drawee.view.SimpleDraweeView
 import kotlinx.android.synthetic.main.activity_account_info.*
 import kotlinx.android.synthetic.main.activity_login_layout.*
-import kotlinx.android.synthetic.main.activity_todo.*
 import toast
-import java.lang.Exception
 
 /**
  * @intro 账号信息
@@ -38,9 +43,13 @@ class AccountInfoActivity : BaseActivity() {
     private lateinit var loginPasswordView: AppCompatEditText
     private lateinit var loginConfirmButton: Button
 
+    private lateinit var customDragAvatarView: CustomDragView
+
     private lateinit var toolbar: Toolbar
 
     private lateinit var accountViewModel: AccountViewModel
+
+    private lateinit var targetBitmap: Bitmap
 
     /**
      * 是否登陆
@@ -66,10 +75,12 @@ class AccountInfoActivity : BaseActivity() {
     override fun cancelRequest() {
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         initToolbar()
+        initView()
     }
 
     /**
@@ -89,11 +100,11 @@ class AccountInfoActivity : BaseActivity() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
+
+    override fun onStart() {
+        super.onStart()
 
         bindViewModel()
-        initView()
     }
 
     override fun initImmersionBar() {
@@ -137,8 +148,9 @@ class AccountInfoActivity : BaseActivity() {
     }
 
     /**
-     *
+     * 初始化 view
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun initView() {
 
         initImmersionBar()
@@ -153,8 +165,37 @@ class AccountInfoActivity : BaseActivity() {
         initNotLoginLayout()
 
         initAccountView()
+
+        initDragAvatarView()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun initDragAvatarView() {
+        customDragAvatarView = custom_drag_avatar_view
+
+        customDragAvatarView.post {
+            ViewUtils.fetchBitmapFromView(customDragAvatarView, this) { bitmap ->
+                handleBitmap(bitmap)
+            }
+        }
+    }
+
+    /**
+     * 得到 bitmap 后的动作
+     */
+    private fun handleBitmap(bitmap: Bitmap) {
+
+        Log.i("zc_test", "AccountInfoActivity handleBitmap bitmap is" + bitmap)
+
+        targetBitmap = bitmap
+
+        customDragAvatarView.targetBitmap = this.targetBitmap
+
+    }
+
+    /**
+     * 初始化未登录的布局
+     */
     private fun initNotLoginLayout() {
 
         if (isLogin) {

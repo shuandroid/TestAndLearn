@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.chendroid.learning.R
 import com.chendroid.learning.bean.BaseDatas
 import com.chendroid.learning.ui.activity.ContentDetailActivity
+import com.chendroid.learning.utils.RxClick
 import com.zhihu.android.sugaradapter.Layout
 import com.zhihu.android.sugaradapter.SugarHolder
 import kotlinx.android.synthetic.main.layout_article_list_item.view.*
@@ -59,9 +60,12 @@ class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClic
     init {
         itemView.setOnClickListener(this)
         articleLikeView.setOnClickListener(this)
+        // 测试防止多次点击
+        RxClick.onClick(articleLikeView, this, 800)
     }
 
     override fun onBindData(data: BaseDatas) {
+
 
         Log.i("zc_test", "HomeListItemHolder onBindData()")
         if (data.author.isEmpty()) {

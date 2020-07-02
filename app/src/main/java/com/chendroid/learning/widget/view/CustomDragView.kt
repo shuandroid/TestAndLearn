@@ -2,15 +2,17 @@ package com.chendroid.learning.widget.view
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
+import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.ViewConfiguration
-import android.view.ViewGroup
+import android.view.*
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.dynamicanimation.animation.DynamicAnimation
 import androidx.dynamicanimation.animation.SpringAnimation
@@ -19,17 +21,17 @@ import com.chendroid.learning.R
 import com.chendroid.learning.utils.ViewOutlineProviderUtils
 import com.facebook.drawee.view.SimpleDraweeView
 import dp
+import java.lang.Exception
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 /**
- * @intro
+ * @intro 可拖拽 view，使用 onTouchEvent 处理
  * @author zhaochen@ZhiHu Inc.
  * @since 2020/6/17
  */
 class CustomDragView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
     : ConstraintLayout(context, attrs, defStyleAttr) {
-
 
     // 是否在滑动的标识位
     private var mScrolling = false
@@ -58,6 +60,10 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
 
     private var screenWidth: Float
 
+    lateinit var targetBitmap: Bitmap
+
+    lateinit var bitmapPaint: Paint
+
     /**
      * 原始的位置
      */
@@ -78,6 +84,10 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
         apply {
             isClickable = true
         }
+
+        bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+//        bitmapPaint.alpha = 1
+        bitmapPaint.style = Paint.Style.FILL
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -87,13 +97,12 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
         parentViewMaxHeight = (parent as ViewGroup).height.toFloat()
 
         // 获取原始 view 的位置
-        originPositionX = x
-        originPositionY = y
+        originPositionX = avatarView.x
+        originPositionY = avatarView.y
     }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-
 
     }
 
@@ -103,8 +112,7 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
      */
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
 
-        //如果不支持拖拽，则不拦截
-        if (!isSupportDrag) {
+        if (!inAvatarViewInterval(event)) {
             return super.onInterceptTouchEvent(event)
         }
 
@@ -130,12 +138,14 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
         return mScrolling
     }
 
+
     /**
      * 处理事件
      */
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
+    override fun onTouchEvent(event: MotionEvent): Boolean {
 
-        if (!isSupportDrag) {
+////        // 如果不再头像区域，则不拦截
+        if (!inAvatarViewInterval(event)) {
             return super.onTouchEvent(event)
         }
 
@@ -151,7 +161,6 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
             }
 
             MotionEvent.ACTION_MOVE -> run {
-
                 Log.i("zc_test", "onTouchEvent() ACTION_MOVE ")
                 if (!mIsCanMove) {
                     //
@@ -162,14 +171,13 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
                     //不满足对滑动距离的判断，则直接返回
                     return@run
                 }
-                Log.i("zc_test", "onTouchEvent() ACTION_MOVE 符合滑动 ")
 
                 mScrolling = true
 
                 if (isFirstMove) {
-                    Log.i("zc_test", "onTouchEvent() isFirstMove is true ")
-                    mFirstX = x
-                    mFirstY = y
+//                    Log.i("zc_test", "onTouchEvent() isFirstMove is true ")
+                    mFirstX = avatarView.x
+                    mFirstY = avatarView.y
                     mPrevX = event.rawX
                     mPrevY = event.rawY
                     isFirstMove = false
@@ -200,13 +208,52 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     private fun moveViewByDrag() {
-        // 移动 view x, y 的坐标
-        x = mCurX
-        y = mCurY
+        // 移动 view x, y 的坐标 设置为对应的 avatar view
+        avatarView.x = mCurX
+        avatarView.y = mCurY
 
-        // todo 设置其他部分实现
-
+        invalidate()
     }
+
+    /**
+     * 是否 event 位于 avatarView 里面
+     */
+    private fun inAvatarViewInterval(event: MotionEvent): Boolean {
+
+        val eventX = event.rawX
+        val eventY = event.rawY
+
+        // 获取当前 view 在屏幕的位置
+        val location = IntArray(2)
+        avatarView.getLocationOnScreen(location)
+
+        val avatarX = location[0]
+        val avatarY = location[1]
+
+        Log.i("zc_test", "inAvatarViewInterval x is $avatarX, and y is $avatarY ")
+
+        val radius = (avatarView.right - avatarView.left) / 2
+
+        val centerX = avatarX + radius
+        val centerY = avatarY + radius
+
+        // event 和 中心点坐标的差值
+        val offsetX = Math.abs(eventX - centerX)
+        val offsetY = Math.abs(eventY - centerY)
+
+        val offsetRadius = Math.sqrt(Math.pow(offsetX.toDouble(), 2.0) + Math.pow(offsetY.toDouble(), 2.0))
+
+        if (offsetRadius > radius) {
+            Log.i("zc_test", "inAvatarViewInterval return false ")
+
+            return false
+        }
+
+        Log.i("zc_test", "inAvatarViewInterval return true ")
+
+        return true
+    }
+
 
     /**
      *  重置 view
@@ -214,8 +261,8 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
     private fun resetView() {
 
         // SpringForce 不能使用同一个，不然，finalPosition 会被覆盖掉
-        val springX = SpringAnimation(this, DynamicAnimation.X).setSpring(SpringForce().setDampingRatio(SpringForce.DAMPING_RATIO_HIGH_BOUNCY).setStiffness(SpringForce.STIFFNESS_MEDIUM))
-        val springY = SpringAnimation(this, DynamicAnimation.Y).setSpring(SpringForce().setDampingRatio(SpringForce.DAMPING_RATIO_HIGH_BOUNCY).setStiffness(SpringForce.STIFFNESS_MEDIUM))
+        val springX = SpringAnimation(avatarView, DynamicAnimation.X).setSpring(SpringForce().setDampingRatio(SpringForce.DAMPING_RATIO_HIGH_BOUNCY).setStiffness(SpringForce.STIFFNESS_MEDIUM))
+        val springY = SpringAnimation(avatarView, DynamicAnimation.Y).setSpring(SpringForce().setDampingRatio(SpringForce.DAMPING_RATIO_HIGH_BOUNCY).setStiffness(SpringForce.STIFFNESS_MEDIUM))
 
         Log.i("zc_test", "spring test animate originPositionX is $originPositionX, and originPositionY is  $originPositionY")
         springX.animateToFinalPosition(originPositionX)
@@ -232,8 +279,8 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
         }
 
         // Y 轴下边界
-        if (mCurY > parentViewMaxHeight - height) {
-            mCurY = parentViewMaxHeight - height
+        if (mCurY > parentViewMaxHeight - avatarView.height) {
+            mCurY = parentViewMaxHeight - avatarView.height
         }
 
         // X 轴左边界
@@ -242,8 +289,8 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
         }
 
         // X 轴右边界
-        if (mCurX > screenWidth - 10.dp - width) {
-            mCurX = screenWidth - 10.dp - width
+        if (mCurX > screenWidth - 10.dp - avatarView.width) {
+            mCurX = screenWidth - 10.dp - avatarView.width
         }
     }
 
@@ -256,18 +303,16 @@ class CustomDragView @JvmOverloads constructor(context: Context, attrs: Attribut
         return event.getPointerId(event.actionIndex) == 0
     }
 
-
-    private fun fetchBitmap() {
-
-        val bitmap = Bitmap.createBitmap(avatarView.width, avatarView.height, Bitmap.Config.ARGB_8888)
-
-        val locationOfViewInWindow = IntArray(2)
-        avatarView.getLocationInWindow(locationOfViewInWindow)
-
-
-
-
-
+    override fun dispatchDraw(canvas: Canvas?) {
+        super.dispatchDraw(canvas)
+//
+        Log.i("zc_test", "dispatchDraw hahhahah")
+        if (mScrolling) {
+            canvas?.run {
+                Log.i("zc_test", "dispatchDraw hahhahah drawBitmap")
+//                drawBitmap(targetBitmap, 0F, 0F, bitmapPaint)
+            }
+        }
     }
 
 }

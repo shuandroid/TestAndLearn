@@ -82,6 +82,11 @@ dependencies {
     //圆形 CircleImageView
     api 'de.hdodenhof:circleimageview:3.0.0'
 
+    // Rxbinding
+    implementation 'com.jakewharton.rxbinding4:rxbinding:4.0.0'
+
+    implementation 'com.trello.rxlifecycle4:rxlifecycle-android:4.0.0'
+
     // chrome inspector
     implementation 'com.facebook.stetho:stetho:1.5.1'
     implementation 'com.facebook.stetho:stetho-okhttp3:1.5.1'
