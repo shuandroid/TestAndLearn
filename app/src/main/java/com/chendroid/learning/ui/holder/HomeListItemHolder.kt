@@ -68,11 +68,7 @@ class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClic
 
 
         Log.i("zc_test", "HomeListItemHolder onBindData()")
-        if (data.author.isEmpty()) {
-            authorTextView.text = data.shareUser
-        } else {
-            authorTextView.text = data.author
-        }
+        authorTextView.text = data.author.ifEmpty { data.shareUser }
         articleTitleView.text = data.title
         articleDateView.text = data.niceDate
         articleTypeView.tagText = data.chapterName

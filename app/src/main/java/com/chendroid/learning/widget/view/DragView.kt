@@ -118,7 +118,6 @@ class DragView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         }
 
         val delta: Int
-
         when (event!!.action) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> run {
                 mTouchDownX = event.x

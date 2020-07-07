@@ -1,7 +1,9 @@
 package com.chendroid.demo;
 
+import java.util.Stack;
+
 /**
- * @author zhaochen@ZhiHu Inc.
+ * @author zhaochen@ZhiHu Inc. 算法二三
  * @intro test
  * @since 2020/6/19
  */
@@ -39,7 +41,84 @@ class LearnTest {
     }
 
 
+    // 反转二叉树, 递归
+    private TreeNode reverseTree(TreeNode root) {
 
+        if (root == null) {
+            return root;
+        }
+
+        TreeNode temp = root.leftNode;
+
+        root.leftNode = reverseTree(root.rightNode);
+        root.rightNode = reverseTree(temp);
+        return root;
+    }
+
+    // 反转二叉树，
+    private TreeNode reverseTree2(TreeNode root) {
+
+        if (root == null) {
+            return root;
+        }
+
+        Stack<TreeNode> stack = new Stack<>();
+
+        stack.push(root);
+
+        while (!stack.isEmpty()) {
+
+            TreeNode node = stack.peek();
+            stack.pop();
+
+            if (node.leftNode != null) {
+                stack.push(node.leftNode);
+            }
+
+            if (node.rightNode != null) {
+                stack.push(node.rightNode);
+            }
+
+            TreeNode temp = node.leftNode;
+            node.leftNode = node.rightNode;
+
+            node.rightNode = temp;
+
+        }
+
+        return root;
+    }
+
+    static class TreeNode {
+        int value;
+        TreeNode leftNode;
+        TreeNode rightNode;
+    }
+
+    // 单
+    static class ListNode {
+        int value;
+        ListNode nextNode;
+    }
+
+    // 反转单链表
+    private ListNode reverseNode(ListNode node) {
+        ListNode pre, cur;
+        pre = null;
+        cur = node;
+
+        // pre 是存放的反转后的链表的头
+        while (cur != null) {
+            ListNode next = cur.nextNode;
+            cur.nextNode = pre;
+
+            pre = cur;
+            cur = next;
+        }
+
+        return pre;
+
+    }
 
 
 }

@@ -22,6 +22,7 @@ import com.chendroid.learning.utils.ViewUtils
 import com.chendroid.learning.vm.AccountViewModel
 import com.chendroid.learning.widget.view.CustomDragView
 import com.chendroid.learning.widget.view.TagView
+import com.chendroid.learning.widget.view.TestConstraintLayout
 import com.facebook.drawee.view.SimpleDraweeView
 import kotlinx.android.synthetic.main.activity_account_info.*
 import kotlinx.android.synthetic.main.activity_login_layout.*
@@ -43,13 +44,15 @@ class AccountInfoActivity : BaseActivity() {
     private lateinit var loginPasswordView: AppCompatEditText
     private lateinit var loginConfirmButton: Button
 
-    private lateinit var customDragAvatarView: CustomDragView
+//    private lateinit var customDragAvatarView: CustomDragView
 
     private lateinit var toolbar: Toolbar
 
     private lateinit var accountViewModel: AccountViewModel
 
     private lateinit var targetBitmap: Bitmap
+
+    private lateinit var contentView: TestConstraintLayout
 
     /**
      * 是否登陆
@@ -155,6 +158,8 @@ class AccountInfoActivity : BaseActivity() {
 
         initImmersionBar()
 
+        contentView = account_content_view
+
         loginLayout = account_login_layout_root
         userNameView = account_user_name
         userAvatarView = account_user_avatar
@@ -167,14 +172,16 @@ class AccountInfoActivity : BaseActivity() {
         initAccountView()
 
         initDragAvatarView()
+
+        contentView.setTargetView(userAvatarView)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initDragAvatarView() {
-        customDragAvatarView = custom_drag_avatar_view
+//        customDragAvatarView = custom_drag_avatar_view
 
-        customDragAvatarView.post {
-            ViewUtils.fetchBitmapFromView(customDragAvatarView, this) { bitmap ->
+        userAvatarView.post {
+            ViewUtils.fetchBitmapFromView(userAvatarView, this) { bitmap ->
                 handleBitmap(bitmap)
             }
         }
@@ -188,9 +195,9 @@ class AccountInfoActivity : BaseActivity() {
         Log.i("zc_test", "AccountInfoActivity handleBitmap bitmap is" + bitmap)
 
         targetBitmap = bitmap
+//        customDragAvatarView.targetBitmap = this.targetBitmap
 
-        customDragAvatarView.targetBitmap = this.targetBitmap
-
+        contentView.setTestTargetBitmap(this.targetBitmap)
     }
 
     /**

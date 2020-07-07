@@ -1,11 +1,12 @@
 package com.chendroid.learning.bean
 
+
 /**
  * @intro 文章的基本数据
  * @author zhaochen @ Zhihu Inc.
  * @since  2019/5/16
  */
-class BaseDatas(
+data class BaseDatas(
         var id: Int,
         /**
          * -1 代表不需要该值
