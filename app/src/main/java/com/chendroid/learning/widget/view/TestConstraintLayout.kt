@@ -11,12 +11,11 @@ import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.View
 import android.view.ViewConfiguration
-import android.view.animation.AnticipateOvershootInterpolator
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.interpolator.view.animation.FastOutLinearInInterpolator
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import com.chendroid.learning.R
 import com.chendroid.learning.utils.ViewUtils
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -66,6 +65,9 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     // 第二个残影的 bitmap 画笔
     var secondAlphaPaint: Paint
 
+    // 第一个 bitmap 的坐标
+    var firstX = 0F
+    var firstY = 0F
     var secondX = 0F
     var secondY = 0F
 
@@ -87,13 +89,10 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
 
     var count = 1
 
-    lateinit var targetCanvas: Canvas
 
-    private val xmode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-
+    var firstAnimatorSet: AnimatorSet? = null
     var secondAnimatorSet: AnimatorSet? = null
-
-//    var secondValueAnimator: ValueAnimator? = null
+    var thirdAnimator: ValueAnimator? = null
 
     init {
 
@@ -168,7 +167,6 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
 //            }
 //        }
 
-
         if (velocityTracker == null) {
             velocityTracker = VelocityTracker.obtain()
         }
@@ -201,7 +199,6 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
                     return@run
                 }
                 Log.i("zc_test", "onTouchEvent() ACTION_MOVE 符合滑动 ")
-
                 mScrolling = true
 
                 if (isFirstMove) {
@@ -212,6 +209,9 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
                     mPrevY = event.rawY
                     mFirstEventX = event.rawX
                     mFirstEventY = event.rawY
+
+                    firstX = mFirstX
+                    firstY = mFirstY
 
                     secondX = mFirstX
                     secondY = mFirstY
@@ -224,16 +224,18 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
 
                 val deltaX = event.rawX - mFirstEventX
                 val deltaY = event.rawY - mFirstEventY
+
                 // 这里测试,
                 // 仍然不和谐
-                if (count % 8 == 0) {
-                    mPrevX = mCurX
-                    mPrevY = mCurY
-                }
+                mPrevX = mCurX
+                mPrevY = mCurY
+
                 count++
+
                 mCurX = mFirstX + deltaX
                 mCurY = mFirstY + deltaY
 
+                // 速率是否需要使用
                 velocityTracker?.run {
                     computeCurrentVelocity(1000)
                     xEventVelocity = getXVelocity()
@@ -299,29 +301,68 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
      */
     private fun handleDragMoving() {
 
-//        Log.i("zc_test", "handleDragMoving 速度为：$xEventVelocity, and y is $yEventVelocity")
         targetDragView.visibility = View.INVISIBLE
 
-//        postDelayed({
-//            secondX = mCurX
-//            secondY = mCurY
-//        }, 200)
-//
-//        postDelayed({
-//            thirdX = mCurX
-//            thirdY = mCurY
-//        }, 400)
+        Log.i("zc_test", "handleDragMoving 这里 mCurX is $mCurX, mPrevX  is $mPrevX， mCurY is $mCurY，mPrevY is $mCurY  ")
 
-        if (secondAnimatorSet != null && secondAnimatorSet!!.isRunning) {
+        if (mCurX == mPrevX && mCurY == mPrevY) {
+            // 悬停时，不刷新
             return
         }
 
-//        calculateSecondPosition()
-        invalidate()
+        // 第一个 bitmap 设置动画
+        startFirstBitmapAnimator()
+
+        startSecondBitmapAnimator()
+
+        startThirdBitmapAnimator()
     }
 
-    // 计算第二个的位置
-    private fun calculateSecondPosition() {
+    private fun startFirstBitmapAnimator() {
+        // 第一个 bitmap 的动画
+        firstAnimatorSet?.run {
+            if (isRunning) {
+                return
+            } else {
+                removeAllListeners()
+                cancel()
+            }
+        }
+
+        val animatorStartX = firstX
+        val animatorStartY = firstY
+
+        val firstXAnimator = ValueAnimator.ofFloat(0F, 1F)
+        val firstYAnimator = ValueAnimator.ofFloat(0F, 1F)
+
+        firstXAnimator.addUpdateListener {
+            if (firstX == mCurX && firstY == mCurY) {
+                firstAnimatorSet?.apply {
+                    removeAllListeners()
+                    cancel()
+                }
+                firstAnimatorSet?.cancel()
+                return@addUpdateListener
+            }
+            firstX = (it.animatedValue as Float) * (mCurX - animatorStartX) + animatorStartX
+        }
+
+        firstYAnimator.addUpdateListener {
+            firstY = (it.animatedValue as Float) * (mCurY - animatorStartY) + animatorStartY
+        }
+
+        firstAnimatorSet = AnimatorSet()
+        firstAnimatorSet?.apply {
+            playTogether(firstXAnimator, firstYAnimator)
+            interpolator = LinearInterpolator()
+            duration = 25
+        }
+
+        firstAnimatorSet?.start()
+    }
+
+    // 第二个 bitmap 的绘制在这里改变
+    private fun startSecondBitmapAnimator() {
         // 使用动画
         secondAnimatorSet?.run {
             // 如果正在运行，则不影响它的运行，下次再开启动画
@@ -333,45 +374,93 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             cancel()
         }
 
+        val animatorStartX = secondX
+        val animatorStartY = secondY
+        // 这样不和谐
+        val targetX = mCurX
+        val targetY = mCurY
         secondAnimatorSet = AnimatorSet()
 
         val xSecondValueAnimator = ValueAnimator.ofFloat(0F, 1F)
-        val ySecondValueAnimator = ValueAnimator.ofFloat(0F, 1F)
-
         xSecondValueAnimator?.addUpdateListener {
-            Log.i("zc_test", "calculateSecondPosition 这里 second is $secondX, and value is ${it.animatedValue as Float}")
-            moveValue = (it.animatedValue as Float)
-//            secondX += (it.animatedValue as Float) * (mCurX - secondX)
-            invalidate()
+
+            if (secondX == targetX && secondY == targetY) {
+                secondAnimatorSet?.apply {
+                    removeAllListeners()
+                    cancel()
+                }
+                return@addUpdateListener
+            }
+
+            if (secondX == mCurX && secondY == mCurY) {
+                secondAnimatorSet?.apply {
+                    removeAllListeners()
+                    cancel()
+                }
+                return@addUpdateListener
+            }
+            secondX = (it.animatedValue as Float) * (targetX - animatorStartX) + animatorStartX
+            secondY = (it.animatedValue as Float) * (targetY - animatorStartY) + animatorStartY
+//            invalidate()
         }
-
-        ySecondValueAnimator?.addUpdateListener {
-//            secondY += (it.animatedValue as Float) * (mCurY - secondY)
-        }
-
-        secondAnimatorSet?.addListener(object : Animator.AnimatorListener {
-            override fun onAnimationRepeat(animation: Animator?) {
-
-            }
-
-            override fun onAnimationEnd(animation: Animator?) {
-            }
-
-            override fun onAnimationCancel(animation: Animator?) {
-
-            }
-
-            override fun onAnimationStart(animation: Animator?) {
-                moveValue = 0f
-            }
-        })
 
         secondAnimatorSet?.run {
-            playTogether(xSecondValueAnimator, ySecondValueAnimator)
-            duration = 500
+            playTogether(xSecondValueAnimator)
+            interpolator = AccelerateDecelerateInterpolator()
+            duration = 75
         }
 
         secondAnimatorSet?.start()
+    }
+
+    // 开启第三个 bitmap 位置计算
+    private fun startThirdBitmapAnimator() {
+
+        // 使用动画
+        thirdAnimator?.run {
+            // 如果正在运行，则不影响它的运行，下次再开启动画
+            if (isRunning) {
+                return
+            }
+            removeAllListeners()
+            cancel()
+        }
+
+        val targetX = mCurX
+        val targetY = mCurY
+
+        val animatorStartX = thirdX
+        val animatorStartY = thirdY
+
+        thirdAnimator = ValueAnimator.ofFloat(0F, 1F)
+        thirdAnimator?.addUpdateListener {
+
+            if (thirdX == targetX && thirdY == targetY) {
+                thirdAnimator?.apply {
+                    removeAllListeners()
+                    cancel()
+                }
+                return@addUpdateListener
+            }
+
+            if (thirdX == mCurX && thirdY == mCurY) {
+                thirdAnimator?.apply {
+                    removeAllListeners()
+                    cancel()
+                }
+                return@addUpdateListener
+            }
+            thirdX = (it.animatedValue as Float) * (targetX - animatorStartX) + animatorStartX
+            thirdY = (it.animatedValue as Float) * (targetY - animatorStartY) + animatorStartY
+            invalidate()
+        }
+        // todo 动画时间有待继续调整
+        thirdAnimator?.run {
+            interpolator = AccelerateDecelerateInterpolator()
+            duration = 125
+        }
+
+        thirdAnimator?.start()
     }
 
     /**
@@ -380,10 +469,30 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     private fun handleDragOver() {
         mScrolling = false
         isResettingView = true
+        clearStartAnimator()
         resetAnimator()
     }
 
-    // 恢复原来位置动画
+    // 清除所有开始动画
+    private fun clearStartAnimator() {
+
+        firstAnimatorSet?.run {
+            removeAllListeners()
+            cancel()
+        }
+
+        secondAnimatorSet?.run {
+            removeAllListeners()
+            cancel()
+        }
+
+        thirdAnimator?.run {
+            removeAllListeners()
+            cancel()
+        }
+    }
+
+    // 恢复原来位置动画, 基本没问题
     private fun resetAnimator() {
 
         val mostXValue = mCurX
@@ -394,20 +503,58 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         xValueAnimator.addUpdateListener {
             mCurX = (it.animatedValue as Float)
             // 刷新界面
-            invalidate()
+//            invalidate()
         }
 
         yValueAnimator.addUpdateListener {
             mCurY = (it.animatedValue as Float)
         }
 
+        secondX = mostXValue
+        secondY = mostYValue
+        val secondXValueAnimator = ValueAnimator.ofFloat(mostXValue, targetDragView.x)
+        val secondYValueAnimator = ValueAnimator.ofFloat(mostYValue, targetDragView.y)
+        secondXValueAnimator.addUpdateListener {
+            secondX = ((it.animatedValue as Float))
+//            invalidate()
+        }
+
+        secondYValueAnimator.addUpdateListener {
+            secondY = ((it.animatedValue as Float))
+        }
+
+        val animatorSet2 = AnimatorSet()
+        animatorSet2.playTogether(secondXValueAnimator, secondYValueAnimator)
+        animatorSet2.interpolator = OvershootInterpolator()
+        animatorSet2.duration = 500
+
+        // 第三个
+        thirdX = mostXValue
+        thirdY = mostYValue
+        val thirdXValueAnimator = ValueAnimator.ofFloat(mostXValue, targetDragView.x)
+        val thirdYValueAnimator = ValueAnimator.ofFloat(mostYValue, targetDragView.y)
+        thirdXValueAnimator.addUpdateListener {
+            thirdX = ((it.animatedValue as Float))
+            invalidate()
+        }
+
+        thirdYValueAnimator.addUpdateListener {
+            thirdY = ((it.animatedValue as Float))
+        }
+
+        val animatorSet3 = AnimatorSet()
+        animatorSet3.playTogether(thirdXValueAnimator, thirdYValueAnimator)
+        animatorSet3.interpolator = OvershootInterpolator()
+        animatorSet3.duration = 700
+
         val animatorSet = AnimatorSet()
 
         animatorSet.playTogether(xValueAnimator, yValueAnimator)
+
         animatorSet.interpolator = OvershootInterpolator()
         animatorSet.duration = 300
 
-        animatorSet.addListener(object : Animator.AnimatorListener {
+        animatorSet3.addListener(object : Animator.AnimatorListener {
             override fun onAnimationRepeat(animation: Animator?) {
             }
 
@@ -425,35 +572,35 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         })
 
         animatorSet.start()
+        animatorSet2.start()
+        animatorSet3.start()
     }
 
     override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
 
         if (mScrolling) {
-//            Log.i("zc_test", "TestConstraintLayout dispatchDraw here here scrolling")
-//            canvas.drawBitmap(targetBitmap, thirdX, thirdY, secondAlphaPaint)
-
-            Log.i("zc_test", "TestConstraintLayout dispatchDraw secondX is $secondX, and y is $secondY， and curx is $mCurX, and curY is $mCurY")
-
-//            canvas.drawBitmap(targetBitmap, secondX , secondY, secondAlphaPaint)
-
-//            canvas.drawBitmap(targetBitmap, (mPrevX + (mCurX - mPrevX) * 0.7).toFloat(), (mPrevY + (mCurY - mPrevY) * 0.7).toFloat(), secondAlphaPaint)
-
-            // todo 最好的方式是 第二个 bitmap 的位置，是逐渐变化的，而不是跳跃式变化
-//            canvas.drawBitmap(targetBitmap, (mPrevX + (mCurX - mPrevX) * moveValue).toFloat(), (mPrevY + (mCurY - mPrevY) * moveValue).toFloat(), secondAlphaPaint)
-
             // 绘画第二个第三个 bitmap
+            canvas.drawBitmap(targetBitmap, thirdX, thirdY, secondAlphaPaint)
+            canvas.drawBitmap(targetBitmap, secondX, secondY, secondAlphaPaint)
 
             // 第一个，最上面的 bitmap
-            canvas.drawBitmap(targetBitmap, mCurX, mCurY, bitmapPaint)
+            canvas.drawBitmap(targetBitmap, firstX, firstY, bitmapPaint)
+
+            // 原本的代码：第一个，最上面的 bitmap
+//            canvas.drawBitmap(targetBitmap, firstX, firstY, bitmapPaint)
         }
 
+        // 恢复这里是没问题的
         if (isResettingView) {
             // 复位 view 时的操作
+            // 第三个 bitmap
+            canvas.drawBitmap(targetBitmap, thirdX, thirdY, secondAlphaPaint)
+            // 第二个 bitmap
+            canvas.drawBitmap(targetBitmap, secondX, secondY, secondAlphaPaint)
+            // 第一个 bitmap
             canvas.drawBitmap(targetBitmap, mCurX, mCurY, bitmapPaint)
         }
-
     }
 
 
