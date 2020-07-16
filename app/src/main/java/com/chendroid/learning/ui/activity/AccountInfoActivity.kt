@@ -20,9 +20,8 @@ import com.chendroid.learning.base.Preference
 import com.chendroid.learning.bean.LoginResponse
 import com.chendroid.learning.utils.ViewUtils
 import com.chendroid.learning.vm.AccountViewModel
-import com.chendroid.learning.widget.view.CustomDragView
 import com.chendroid.learning.widget.view.TagView
-import com.chendroid.learning.widget.view.TestConstraintLayout
+import com.chendroid.learning.widget.view.DragConstraintLayout
 import com.facebook.drawee.view.SimpleDraweeView
 import kotlinx.android.synthetic.main.activity_account_info.*
 import kotlinx.android.synthetic.main.activity_login_layout.*
@@ -52,7 +51,7 @@ class AccountInfoActivity : BaseActivity() {
 
     private lateinit var targetBitmap: Bitmap
 
-    private lateinit var contentView: TestConstraintLayout
+    private lateinit var contentView: DragConstraintLayout
 
     /**
      * 是否登陆

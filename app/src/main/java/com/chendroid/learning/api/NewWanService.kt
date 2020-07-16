@@ -39,7 +39,6 @@ interface NewWanService {
     @POST("/lg/collect/{article_id}/json")
     suspend fun collectArticle(@Path("article_id") articleId: String): Response<CollectArticleResponse>
 
-    // todo FormUrlEncoded 的作用
     /**
      * 取消收藏文章
      */
@@ -65,5 +64,8 @@ interface NewWanService {
     @FormUrlEncoded
     suspend fun addNewTodo(@Field("title") title: String, @Field("content") content: String,
                            @Field("type") type: Int): Response<TodoResponseData>
+
+    @GET("/tree/json")
+    suspend fun getArticleTypeList(): Response<TagListResponse>
 
 }

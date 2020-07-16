@@ -1,14 +1,11 @@
 package com.chendroid.learning.repository
 
+import android.util.Log
 import com.chendroid.care.data.Result
 import com.chendroid.care.data.Result.Success
 import com.chendroid.care.util.safeApiCall
 import com.chendroid.learning.api.ApiServiceHelper
 import com.chendroid.learning.bean.ArticleTagData
-import com.chendroid.learning.bean.TagListResponse
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import java.io.IOException
 
 /**
@@ -18,67 +15,24 @@ import java.io.IOException
  */
 class ArticleTagDataSource {
 
-    interface ArticleTagListCallback {
-        /**
-         * 获取数据成功
-         */
-        fun success(articleTagList: List<ArticleTagData>)
-
-        fun error(errorMsg: String)
-    }
-
-    /**
-     * 获取更多文章类型列表
-     */
-    @SuppressWarnings("checkResult")
-    fun getMoreArticleTreeList(callback: ArticleTagListCallback) {
-
-        GlobalScope.async {
-
-            val articleTypeList = ApiServiceHelper.wanAndroidService.getArticleTypeList()
-            val result = articleTypeList.await()
-
-            if (result.errorCode != 0) {
-                callback.error("错误信息为" + result.errorMsg)
-                return@async
-            }
-
-            result.data ?: let {
-                // 如果数据为空， 没有文章类型
-                callback.error("没有拿到文章类型数据")
-                return@async
-            }
-
-            // 成功
-            result.data?.run {
-                callback.success(this)
-            }
-        }
-    }
-
-    /**
-     * 获取类型下的文章列表
-     */
-    fun getArticleList() = GlobalScope.launch {
-
-
-    }
-
-
-    suspend fun getArticleDataByKt() = safeApiCall(
+    suspend fun getArticleTypeList() = safeApiCall(
             call = { requestArticleTag() },
             errorMessage = "请求出错啦～～～"
     )
 
     private suspend fun requestArticleTag(): Result<List<ArticleTagData>> {
-
-        val response = ApiServiceHelper.wanAndroidService.getArticleTypeListTestAsync()
-
-        if (response.data != null) {
-            return Success(response.data!!)
+        Log.i("zc_test", "requestArticleTag")
+        val response = ApiServiceHelper.newWanService.getArticleTypeList()
+        Log.i("zc_test", "requestArticleTag() response is $response")
+        if (response.isSuccessful) {
+            val body = response.body()
+            body?.run {
+                return Success(data!!)
+            }
         }
 
-        return Result.Error(IOException("error message error code is ${response.errorCode} and body is ${response.errorMsg}"))
+        Log.i("zc_test", "error message error code is ${response.body()!!.errorCode} and body is ${response.body()!!.errorMsg}")
+        return Result.Error(IOException("error message error code is ${response.body()!!.errorCode} and body is ${response.body()!!.errorMsg}"))
     }
 
 }

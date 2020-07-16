@@ -16,6 +16,7 @@ class Preference<T>(private val name: String, private val default: T) : ReadWrit
 
     companion object {
         lateinit var preferences: SharedPreferences
+
         /**
          * init Context
          * @param context Context
@@ -39,7 +40,7 @@ class Preference<T>(private val name: String, private val default: T) : ReadWrit
 
     @Suppress("UNCHECKED_CAST")
     private fun <U> findPreference(name: String, default: U): U = with(preferences) {
-        val res: Any = when (default) {
+        val res = when (default) {
             is Long -> getLong(name, default)
             is String -> getString(name, default)
             is Int -> getInt(name, default)

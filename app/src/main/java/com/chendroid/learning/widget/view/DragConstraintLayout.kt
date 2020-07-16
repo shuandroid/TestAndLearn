@@ -3,8 +3,12 @@ package com.chendroid.learning.widget.view
 import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
+import android.app.Service
 import android.content.Context
 import android.graphics.*
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -12,7 +16,6 @@ import android.view.VelocityTracker
 import android.view.View
 import android.view.ViewConfiguration
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -21,13 +24,12 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 /**
- * @intro 测试测试
+ * @intro 可指定一个目标 view，可以实现类似拖动 view 的效果。「其实并没有拖动 view，是画出来的 bitmap」
  * @author zhaochen@ZhiHu Inc.
  * @since 2020/7/2
  */
-class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
+class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
     : ConstraintLayout(context, attrs, defStyleAttr) {
-
 
     // 第一次手势 down, 按下时的 x, y 位置
     private var mTouchDownX = 0f
@@ -77,7 +79,6 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     // 缩放因子
     var moveValue = 0f
 
-
     // 手势移动速度追踪， 用于计算速度
     var velocityTracker: VelocityTracker? = null
 
@@ -90,7 +91,7 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     var count = 1
 
 
-    var firstAnimatorSet: AnimatorSet? = null
+    var firstAnimator: ValueAnimator? = null
     var secondAnimatorSet: AnimatorSet? = null
     var thirdAnimator: ValueAnimator? = null
 
@@ -108,7 +109,7 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         secondAlphaPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         secondAlphaPaint.apply {
             style = Paint.Style.FILL
-            alpha = (255 * (0.5)).toInt()
+            alpha = (255 * (0.6)).toInt()
         }
 
     }
@@ -118,16 +119,13 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         // down 的时候判断
         if (event.action == MotionEvent.ACTION_DOWN) {
             if (!ViewUtils.isTouchEventInTargetView(event, targetDragView)) {
-                //
-                Log.i("zc_test", "TestConstraintLayout  onInterceptTouchEvent 不拦截")
-
+                mTouchDownX = event.x
+                mTouchDownY = event.y
                 val result = super.onInterceptTouchEvent(event)
                 Log.i("zc_test", "TestConstraintLayout onInterceptTouchEvent result is $result ")
-                return result
+                return false
             }
         }
-
-        Log.i("zc_test", "TestConstraintLayout  onInterceptTouchEvent 该拦截了")
 
         // delta 为移动的距离
         val delta: Int
@@ -139,7 +137,10 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             }
             MotionEvent.ACTION_MOVE -> {
                 // 判断是否符合移动的条件
+
                 delta = sqrt((mTouchDownX - event.x.toDouble()).pow(2.0) + (mTouchDownY - event.y.toDouble()).pow(2.0)).toInt()
+                Log.i("zc_test", "mTouchDownX is $mTouchDownX, and x is ${event.x}, and mTouchDownY is $mTouchDownY, and y is ${event.y}")
+                Log.i("zc_test", "scaledTouchSlop is ${ViewConfiguration.get(context).scaledTouchSlop}, and delta is $delta")
                 mScrolling = delta >= ViewConfiguration.get(context).scaledTouchSlop
 
                 Log.i("zc_test", "TestConstraintLayout onInterceptTouchEvent ACTION_MOVE mScrolling is $mScrolling")
@@ -155,26 +156,29 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     override fun onTouchEvent(event: MotionEvent): Boolean {
         Log.i("zc_test", "TestConstraintLayout onTouchEvent")
         // down 的时候判断
-//        if (event.action == MotionEvent.ACTION_DOWN) {
-//            if (!ViewUtils.isTouchEventInTargetView(event, targetDragView)) {
-//                //
-//                Log.i("zc_test", "TestConstraintLayout  onTouchEvent 不拦截")
-//
-//                val result = super.onTouchEvent(event)
-//                Log.i("zc_test", "TestConstraintLayout onTouchEvent result is $result ")
-//
-//                return result
-//            }
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            if (!ViewUtils.isTouchEventInTargetView(event, targetDragView)) {
+
+                Log.i("zc_test", "TestConstraintLayout  onTouchEvent 不拦截")
+                mTouchDownX = event.x
+                mTouchDownY = event.y
+                val result = super.onTouchEvent(event)
+                Log.i("zc_test", "TestConstraintLayout onTouchEvent result is $result ")
+                return result
+            }
+        }
+
+//        isClickable = true
+
+        // 用不到
+//        if (velocityTracker == null) {
+//            velocityTracker = VelocityTracker.obtain()
 //        }
-
-        if (velocityTracker == null) {
-            velocityTracker = VelocityTracker.obtain()
-        }
-
-        velocityTracker?.run {
-            // 添加进当前事件
-            addMovement(event)
-        }
+//
+//        velocityTracker?.run {
+//            // 添加进当前事件
+//            addMovement(event)
+//        }
 
         val delta: Int
         when (event.action) {
@@ -225,8 +229,6 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
                 val deltaX = event.rawX - mFirstEventX
                 val deltaY = event.rawY - mFirstEventY
 
-                // 这里测试,
-                // 仍然不和谐
                 mPrevX = mCurX
                 mPrevY = mCurY
 
@@ -234,13 +236,6 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
 
                 mCurX = mFirstX + deltaX
                 mCurY = mFirstY + deltaY
-
-                // 速率是否需要使用
-                velocityTracker?.run {
-                    computeCurrentVelocity(1000)
-                    xEventVelocity = getXVelocity()
-                    yEventVelocity = getYVelocity()
-                }
 
                 handleDragMoving()
             }
@@ -300,7 +295,7 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
      * 处理正在拖拽行为
      */
     private fun handleDragMoving() {
-
+        // 设置它为不可见
         targetDragView.visibility = View.INVISIBLE
 
         Log.i("zc_test", "handleDragMoving 这里 mCurX is $mCurX, mPrevX  is $mPrevX， mCurY is $mCurY，mPrevY is $mCurY  ")
@@ -320,7 +315,7 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
 
     private fun startFirstBitmapAnimator() {
         // 第一个 bitmap 的动画
-        firstAnimatorSet?.run {
+        firstAnimator?.run {
             if (isRunning) {
                 return
             } else {
@@ -332,33 +327,27 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         val animatorStartX = firstX
         val animatorStartY = firstY
 
-        val firstXAnimator = ValueAnimator.ofFloat(0F, 1F)
-        val firstYAnimator = ValueAnimator.ofFloat(0F, 1F)
+        firstAnimator = ValueAnimator.ofFloat(0F, 1F)
 
-        firstXAnimator.addUpdateListener {
+        firstAnimator?.addUpdateListener {
             if (firstX == mCurX && firstY == mCurY) {
-                firstAnimatorSet?.apply {
+                firstAnimator?.apply {
                     removeAllListeners()
                     cancel()
                 }
-                firstAnimatorSet?.cancel()
+                firstAnimator?.cancel()
                 return@addUpdateListener
             }
             firstX = (it.animatedValue as Float) * (mCurX - animatorStartX) + animatorStartX
-        }
-
-        firstYAnimator.addUpdateListener {
             firstY = (it.animatedValue as Float) * (mCurY - animatorStartY) + animatorStartY
         }
 
-        firstAnimatorSet = AnimatorSet()
-        firstAnimatorSet?.apply {
-            playTogether(firstXAnimator, firstYAnimator)
+        firstAnimator?.apply {
             interpolator = LinearInterpolator()
             duration = 25
         }
 
-        firstAnimatorSet?.start()
+        firstAnimator?.start()
     }
 
     // 第二个 bitmap 的绘制在这里改变
@@ -476,7 +465,7 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     // 清除所有开始动画
     private fun clearStartAnimator() {
 
-        firstAnimatorSet?.run {
+        firstAnimator?.run {
             removeAllListeners()
             cancel()
         }
@@ -574,6 +563,11 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         animatorSet.start()
         animatorSet2.start()
         animatorSet3.start()
+
+        postDelayed({
+            // 延迟 100 ms 后进行震动
+            startVibrateEffect()
+        }, 100)
     }
 
     override fun dispatchDraw(canvas: Canvas) {
@@ -581,27 +575,48 @@ class TestConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
 
         if (mScrolling) {
             // 绘画第二个第三个 bitmap
-            canvas.drawBitmap(targetBitmap, thirdX, thirdY, secondAlphaPaint)
-            canvas.drawBitmap(targetBitmap, secondX, secondY, secondAlphaPaint)
+            bitmapPaint.alpha = (255 * (0.5)).toInt()
+            canvas.drawBitmap(targetBitmap, thirdX, thirdY, bitmapPaint)
+            bitmapPaint.alpha = (255 * (0.8)).toInt()
+            canvas.drawBitmap(targetBitmap, secondX, secondY, bitmapPaint)
 
             // 第一个，最上面的 bitmap
+            bitmapPaint.alpha = 255
             canvas.drawBitmap(targetBitmap, firstX, firstY, bitmapPaint)
-
-            // 原本的代码：第一个，最上面的 bitmap
-//            canvas.drawBitmap(targetBitmap, firstX, firstY, bitmapPaint)
         }
 
         // 恢复这里是没问题的
         if (isResettingView) {
             // 复位 view 时的操作
             // 第三个 bitmap
-            canvas.drawBitmap(targetBitmap, thirdX, thirdY, secondAlphaPaint)
+            bitmapPaint.alpha = (255 * (0.5)).toInt()
+            canvas.drawBitmap(targetBitmap, thirdX, thirdY, bitmapPaint)
             // 第二个 bitmap
-            canvas.drawBitmap(targetBitmap, secondX, secondY, secondAlphaPaint)
+            bitmapPaint.alpha = (255 * (0.8)).toInt()
+            canvas.drawBitmap(targetBitmap, secondX, secondY, bitmapPaint)
             // 第一个 bitmap
+            bitmapPaint.alpha = 255
             canvas.drawBitmap(targetBitmap, mCurX, mCurY, bitmapPaint)
         }
     }
 
+    // 开启震动效果
+    private fun startVibrateEffect() {
+        if (context == null) {
+            return
+        }
+
+        val vibrator = context.getSystemService(Service.VIBRATOR_SERVICE) as Vibrator
+
+        // 需要添加权限  uses-permission
+        vibrator?.run {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrate(VibrationEffect.createOneShot(30L, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                vibrate(30L)
+            }
+        }
+
+    }
 
 }

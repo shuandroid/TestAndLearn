@@ -9,6 +9,7 @@ import com.chendroid.care.data.Result
 import com.chendroid.learning.bean.ArticleTagData
 import com.chendroid.learning.repository.ArticleTagDataSource
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
 
 /**
  * @intro MoreArticleTagFragment 类对应的 vm 类，处理数据和逻辑
@@ -36,8 +37,8 @@ class MoreArticleTagViewModel(application: Application) : AndroidViewModel(appli
      * 刷新数据
      */
     fun refreshData() {
-        viewModelScope.launch {
-            val result = dataSource.getArticleDataByKt()
+        viewModelScope.launch(IO) {
+            val result = dataSource.getArticleTypeList()
 
             withContext(Dispatchers.Main) {
                 if (result is Result.Success) {
