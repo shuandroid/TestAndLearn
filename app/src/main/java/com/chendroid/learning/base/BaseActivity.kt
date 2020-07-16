@@ -33,7 +33,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        immersionBar.run {
+        immersionBar?.run {
             destroy()
         }
         cancelRequest()

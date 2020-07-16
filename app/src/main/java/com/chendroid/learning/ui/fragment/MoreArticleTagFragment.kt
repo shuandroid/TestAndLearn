@@ -88,7 +88,7 @@ class MoreArticleTagFragment : BaseFragment(), ArticleTypeHolder.ArticleTypeList
         articleTypeAdapter = typeListBuilder.build()
 
         recyclerView.adapter = articleTypeAdapter
-        recyclerView.addItemDecoration(CustomItemDecoration.with(context!!))
+        recyclerView.addItemDecoration(CustomItemDecoration.with(context!!).apply { isFirstShowDecoration = true })
 
         recyclerView.addOnScrollListener(articleListScrollListener)
     }
@@ -109,7 +109,15 @@ class MoreArticleTagFragment : BaseFragment(), ArticleTypeHolder.ArticleTypeList
             onRefreshCompleted(it)
         }
 
-        articleTagViewModel.onLoadDataSuccess().observe(this, loadArticleTypeSuccess)
+        articleTagViewModel.onLoadDataSuccess().observe(viewLifecycleOwner, loadArticleTypeSuccess)
+
+        val loadArticleTypeFailed = Observer<String> {
+            // 当收到 postValue 变化时，会回调此处
+            // 取数据出错时
+            swipeRefreshLayout.isRefreshing = false
+        }
+
+        articleTagViewModel.onLoadDataFailed().observe(viewLifecycleOwner, loadArticleTypeFailed)
 
     }
 

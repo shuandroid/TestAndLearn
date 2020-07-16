@@ -20,4 +20,18 @@ public class DisplayUtils {
         return (int) ((pDp * density) + 0.5f);
     }
 
+    private class ListNode {
+        int key;
+        int val;
+        ListNode pre;
+        ListNode next;
+
+        public ListNode(int key, int val) {
+            this.key = key;
+            this.val = val;
+            pre = null;
+            next = null;
+        }
+    }
+
 }

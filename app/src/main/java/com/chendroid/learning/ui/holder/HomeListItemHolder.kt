@@ -5,9 +5,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.lifecycle.ViewModelProvider
 import com.chendroid.learning.R
 import com.chendroid.learning.bean.BaseDatas
 import com.chendroid.learning.ui.activity.ContentDetailActivity
+import com.chendroid.learning.utils.RxClick
 import com.zhihu.android.sugaradapter.Layout
 import com.zhihu.android.sugaradapter.SugarHolder
 import kotlinx.android.synthetic.main.layout_article_list_item.view.*
@@ -19,6 +21,18 @@ import kotlinx.android.synthetic.main.layout_article_list_item.view.*
  */
 @Layout(R.layout.layout_article_list_item)
 class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClickListener {
+
+
+    interface HomeItemListener {
+        /**
+         * articleId, 当前文章 id
+         * isCollected, 是否收藏过
+         * handleResult, 高阶函数，
+         */
+        fun onCollectViewClicked(articleId: Int, originId: Int, isCollected: Boolean, handleResult: (Boolean) -> Unit)
+    }
+
+    var homeItemListener: HomeItemListener? = null
 
     private val authorTextView by lazy {
         itemView.home_item_author
@@ -46,27 +60,31 @@ class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClic
     init {
         itemView.setOnClickListener(this)
         articleLikeView.setOnClickListener(this)
+        // 测试防止多次点击
+        RxClick.onClick(articleLikeView, this, 800)
     }
 
     override fun onBindData(data: BaseDatas) {
 
+
         Log.i("zc_test", "HomeListItemHolder onBindData()")
-        authorTextView.text = data.author
+        authorTextView.text = data.author.ifEmpty { data.shareUser }
         articleTitleView.text = data.title
         articleDateView.text = data.niceDate
-        articleTypeView.text = data.chapterName
+        articleTypeView.tagText = data.chapterName
 
         if (data.collect) {
             //收藏了该文章 todo
-//            articleLikeView.
+            articleLikeView.setImageDrawable(getDrawable(R.drawable.ic_action_like))
+        } else {
+            articleLikeView.setImageDrawable(getDrawable(R.drawable.ic_action_no_like))
         }
     }
 
     override fun onClick(clickView: View) {
 
         if (clickView === articleLikeView) {
-            // 进行动画～
-            startLikeAnimator()
+            handleCollectViewClicked()
         } else if (clickView === itemView) {
             // 进入具体的文章界面
             Intent(context, ContentDetailActivity::class.java).run {
@@ -103,11 +121,10 @@ class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClic
                 super.onAnimationEnd(animation)
                 Log.i("zc_test", "  111111 onAnimationEnd")
                 if (data.collect) {
-                    articleLikeView.setImageDrawable(getDrawable(R.drawable.ic_action_no_like))
-                } else {
                     articleLikeView.setImageDrawable(getDrawable(R.drawable.ic_action_like))
+                } else {
+                    articleLikeView.setImageDrawable(getDrawable(R.drawable.ic_action_no_like))
                 }
-
                 animatorNewSet.start()
                 animatorAliveSet = animatorNewSet
             }
@@ -126,7 +143,6 @@ class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClic
 
                 Log.i("zc_test", " animatorNewSet onAnimationEnd")
             }
-
         })
     }
 
@@ -136,6 +152,43 @@ class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClic
             if (isRunning) {
                 cancel()
             }
+        }
+    }
+
+    private fun collectArticle() {
+
+//        ViewModelProvider().get()
+
+    }
+
+    /**
+     * 处理收藏 view 的点击事件
+     */
+    private fun handleCollectViewClicked() {
+        //
+        homeItemListener?.run {
+            if (data.collect) {
+                onCollectViewClicked(data.id, data.originId, data.collect) { isSuccess -> handleUnCollectArticleResult(isSuccess) }
+            } else {
+                onCollectViewClicked(data.id, data.originId, data.collect) { isSuccess -> handleCollectArticleResult(isSuccess) }
+            }
+        }
+    }
+
+    /**
+     * 处理收藏文章的结果，成功则动画展示成功；失败，则可以弹窗显示「收藏失败」
+     */
+    private fun handleCollectArticleResult(isSuccess: Boolean) {
+        if (isSuccess) {
+            data.collect = true
+            startLikeAnimator()
+        }
+    }
+
+    private fun handleUnCollectArticleResult(isSuccess: Boolean) {
+        if (isSuccess) {
+            data.collect = false
+            startLikeAnimator()
         }
     }
 

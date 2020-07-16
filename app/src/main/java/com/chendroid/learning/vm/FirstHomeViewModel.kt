@@ -1,11 +1,10 @@
 package com.chendroid.learning.vm
 
+import android.app.Application
+import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.UiThread
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.chendroid.care.data.Result
 import com.chendroid.learning.api.ApiServiceHelper
 import com.chendroid.learning.bean.BaseDatas
@@ -15,19 +14,17 @@ import com.chendroid.learning.data.source.FirstHomeWanDataSource
 import com.chendroid.learning.data.usecase.GetBannerUseCase
 import com.chendroid.learning.ui.holder.EmptyBannerData
 import com.chendroid.learning.ui.holder.data.EmptyData
-import com.chendroid.learning.utils.ViewOutlineProviderUtils
-import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlin.coroutines.ContinuationInterceptor
-import kotlin.coroutines.EmptyCoroutineContext
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * @intro 首页的 ViewModel 处理数据类
  * @author zhaochen@ZhiHu Inc.
  * @since 2019-11-29
  */
-class FirstHomeViewModel : ViewModel() {
+class FirstHomeViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
         const val TAG = "FirstHomeViewModel"
@@ -65,16 +62,29 @@ class FirstHomeViewModel : ViewModel() {
     }
 
 
+    val testData: LiveData<List<BaseDatas>> = liveData {
+
+        val result = firstHomeWanRepo.getArticle()
+        if (result is Result.Success) {
+//            emitSource()
+            emit(result.data.datas!!)
+        }
+    }
+
+    val bannerTest: LiveData<List<HomeBanner.BannerItemData>> = liveData(IO) {
+        val result = getBannerUseCase.getWanAndroidBanner()
+        if (result is Result.Success) {
+            emit(result.data)
+        }
+    }
+
+
     /**
      * 获取首页 banner 信息
      */
     fun getBannerData() {
 
         viewModelScope.launch(IO) {
-
-            val job = coroutineContext[Job]
-            val continuationInterceptor = coroutineContext[ContinuationInterceptor]
-
             val result = getBannerUseCase.getWanAndroidBanner()
             if (result is Result.Success) {
                 withContext(Main) {
@@ -108,7 +118,6 @@ class FirstHomeViewModel : ViewModel() {
         isLoadingArticle = true
         viewModelScope.launch(IO) {
             val result = firstHomeWanRepo.getArticle(page)
-            delay(1000)
             Log.i("zc_test", "11111 current thread is ${Thread.currentThread()}")
             if (result is Result.Success) {
                 result.data.datas?.run {
@@ -144,6 +153,5 @@ class FirstHomeViewModel : ViewModel() {
         isLoadingArticle = false
         articleEmptyLD.value = EmptyData()
     }
-
 
 }

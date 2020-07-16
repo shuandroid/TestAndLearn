@@ -29,12 +29,12 @@ class HomeToolbar @JvmOverloads constructor(context: Context, attrs: AttributeSe
     /**
      * 头像 view
      */
-    private lateinit var avatarImageView: SimpleDraweeView
+    private var avatarImageView: SimpleDraweeView
 
     /**
      * 标题
      */
-    private lateinit var toolbarTitle: TextView
+    private var toolbarTitle: TextView
 
     var homeToolbarListener: HomeToolbarListener? = null
 
@@ -42,6 +42,8 @@ class HomeToolbar @JvmOverloads constructor(context: Context, attrs: AttributeSe
         val view = LayoutInflater.from(context).inflate(R.layout.layout_home_toolbar, this, true)
 
         avatarImageView = view.user_avatar
+        toolbarTitle = view.toolbar_title_text
+        avatarImageView.setOnClickListener(this)
     }
 
     /**
@@ -53,10 +55,9 @@ class HomeToolbar @JvmOverloads constructor(context: Context, attrs: AttributeSe
         }
     }
 
-    fun setToobarTitle(title: String) {
+    fun setToolbarTitle(title: String) {
         toolbarTitle.text = title
     }
-
 
     override fun onClick(clickedView: View) {
 

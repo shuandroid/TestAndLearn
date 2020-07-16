@@ -2,9 +2,9 @@
 <resources>
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorAccent">#008577</color>
 
-    <!--新增-->
+    <!--新增 红色D81B60-->
     <color name="colorCardBg">#FFFFFF</color>
     <color name="item_bg">#FFFFFF</color>
     <color name="while_most_color">#e4e4e4</color>
@@ -17,5 +17,7 @@
     <color name="GBL05A">#8590A6</color>
 
     <color name="f6f6f6">#F6F6F6</color>
+    <color name="blue">#0084FF</color>
+
 
 </resources>

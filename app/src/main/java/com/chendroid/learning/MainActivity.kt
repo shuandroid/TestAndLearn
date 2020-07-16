@@ -23,12 +23,18 @@ class MainActivity : BaseActivity() {
             startActivity(Intent(this, FirstMainActivity::class.java))
         }
 
+        initImmersionBar()
+    }
+
+    override fun initImmersionBar() {
+        super.initImmersionBar()
+        immersionBar.titleBar(R.id.toolbar).init()
     }
 
     override fun onResume() {
         super.onResume()
 
-        secondButton.setOnClickListener{
+        secondButton.setOnClickListener {
             startActivity(Intent(this, TryEveryThingActivity::class.java))
         }
     }

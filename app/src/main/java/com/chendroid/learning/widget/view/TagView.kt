@@ -85,6 +85,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
         val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
         layoutParams.setMargins(MARGIN_WIDTH.dp, MARGIN_HEIGHT.dp, MARGIN_WIDTH.dp, MARGIN_HEIGHT.dp)
+        layoutParams.gravity = Gravity.CENTER
 
         addView(tagTextView, layoutParams)
 

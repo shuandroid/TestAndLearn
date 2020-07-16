@@ -1,9 +1,9 @@
 package com.chendroid.learning.api
 
-import com.chendroid.learning.base.Preference
+import com.chendroid.learning.api.interceptor.AddCookieInterceptor
+import com.chendroid.learning.api.interceptor.SaveCookieInterceptor
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import encodeCookie
 import loge
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -12,23 +12,22 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 /**
- * @intro
+ * @intro 创建 Retrofit 网络请求
  * @author zhaochen @ Zhihu Inc.
  * @since  2019/1/18
  */
 object ApiServiceHelper {
 
-
     private const val TAG = "RetrofitHelper"
     private const val CONTENT_PRE = "OkHttp: "
-    private const val SAVE_USER_LOGIN_KEY = "user/login"
-    private const val SAVE_USER_REGISTER_KEY = "user/register"
-    private const val SET_COOKIE_KEY = "set-cookie"
-    private const val COOKIE_NAME = "Cookie"
+    const val SAVE_USER_LOGIN_KEY = "user/login"
+    const val SAVE_USER_REGISTER_KEY = "user/register"
+    const val SET_COOKIE_KEY = "set-cookie"
+    const val COOKIE_NAME = "Cookie"
     private const val CONNECT_TIMEOUT = 30L
     private const val READ_TIMEOUT = 10L
 
-    val wanAndroidService: WanAndroidService = ApiServiceHelper.getService(Constant.REQUEST_BASE_URL, WanAndroidService::class.java)
+    val wanAndroidService: WanAndroidService = getService(Constant.REQUEST_BASE_URL, WanAndroidService::class.java)
     val newWanService = getService(Constant.REQUEST_BASE_URL, NewWanService::class.java)
 
     private fun create(url: String): Retrofit {
@@ -37,25 +36,17 @@ object ApiServiceHelper {
             connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
             readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
 
-            addInterceptor {
-                val request = it.request()
-                val response = it.proceed(request)
-                val requestUrl = request.url().toString()
-                val domain = request.url().host()
+            /**
+             * 添加拦截器，获取 cookie
+             */
+            addInterceptor(SaveCookieInterceptor())
 
-                // set-cookie maybe has multi, login to save cookie
-                if ((requestUrl.contains(SAVE_USER_LOGIN_KEY) || requestUrl.contains(
-                                SAVE_USER_REGISTER_KEY
-                        ))
-                        && !response.headers(SET_COOKIE_KEY).isEmpty()) {
-                    val cookies = response.headers(SET_COOKIE_KEY)
-                    val cookie = encodeCookie(cookies)
-                    saveCookie(requestUrl, domain, cookie)
-                }
-                response
-            }
+            /**
+             * 添加 cookie
+             */
+            addInterceptor(AddCookieInterceptor())
 
-            // add log print
+            // add log print 调试时可用于查看网络请求的 message 信息
             if (Constant.INTERCEPTOR_ENABLE) {
                 // loggingInterceptor
                 addInterceptor(HttpLoggingInterceptor(HttpLoggingInterceptor.Logger {
@@ -66,7 +57,7 @@ object ApiServiceHelper {
                 })
             }
 
-            // 添加网络拦截
+            // 添加网络拦截， 用于 chrome 的 inspect
             addNetworkInterceptor(StethoInterceptor())
         }
 
@@ -82,21 +73,6 @@ object ApiServiceHelper {
      * get ServiceApi
      */
     private fun <T> getService(url: String, service: Class<T>): T = create(url).create(service)
-
-    /**
-     * save cookie to SharePreferences
-     */
-    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
-    private fun saveCookie(url: String?, domain: String?, cookies: String) {
-        url ?: return
-        var spUrl: String by Preference(url, cookies)
-        @Suppress("UNUSED_VALUE")
-        spUrl = cookies
-        domain ?: return
-        var spDomain: String by Preference(domain, cookies)
-        @Suppress("UNUSED_VALUE")
-        spDomain = cookies
-    }
 
 }
 

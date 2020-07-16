@@ -1,1 +1,4 @@
+include ':processor'
+include ':annotation'
+include ':demo'
 include ':app', ':core'

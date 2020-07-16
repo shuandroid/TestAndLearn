@@ -89,7 +89,6 @@ class TypeDetailActivity : BaseActivity() {
      */
     private fun initBundle() {
 
-//        intent.extras?.getParcelable(EXTRA_ARTICLE_TAG_DATA)
 
         intent.extras?.run {
 

@@ -1,5 +1,6 @@
 package com.chendroid.care.util
 
+import android.util.Log
 import com.chendroid.care.data.Result
 
 import java.io.IOException
@@ -18,6 +19,7 @@ suspend fun <T : Any> safeApiCall(call: suspend () -> Result<T>, errorMessage: S
     return try {
         call()
     } catch (e: Exception) {
+        Log.i("zc_test", "safeApiCall error, exception is $e")
         Result.Error(IOException(errorMessage, e))
     }
 }

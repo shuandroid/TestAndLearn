@@ -16,14 +16,16 @@ class Preference<T>(private val name: String, private val default: T) : ReadWrit
 
     companion object {
         lateinit var preferences: SharedPreferences
+
         /**
          * init Context
          * @param context Context
          */
+        // todo  SP 文件名不行，尽可能分开，多个 SP 文件一起使用
         fun setContext(context: Context) {
             preferences = context.getSharedPreferences(
-                context.packageName + Constant.SHARED_NAME,
-                Context.MODE_PRIVATE
+                    context.packageName + Constant.SHARED_NAME,
+                    Context.MODE_PRIVATE
             )
         }
 
@@ -38,7 +40,7 @@ class Preference<T>(private val name: String, private val default: T) : ReadWrit
 
     @Suppress("UNCHECKED_CAST")
     private fun <U> findPreference(name: String, default: U): U = with(preferences) {
-        val res: Any = when (default) {
+        val res = when (default) {
             is Long -> getLong(name, default)
             is String -> getString(name, default)
             is Int -> getInt(name, default)

@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +22,7 @@ import com.chendroid.learning.ui.holder.EmptyHolder
 import com.chendroid.learning.ui.holder.HomeListItemHolder
 import com.chendroid.learning.ui.holder.data.AllBannerDataWrapper
 import com.chendroid.learning.ui.holder.data.EmptyData
+import com.chendroid.learning.vm.CollectArticleViewModel
 import com.chendroid.learning.vm.FirstHomeViewModel
 import com.chendroid.learning.widget.view.CustomItemDecoration
 import com.zhihu.android.sugaradapter.SugarAdapter
@@ -30,7 +33,7 @@ import kotlinx.android.synthetic.main.fragment_first_home_layout.*
  * @author zhaochen @ Zhihu Inc.
  * @since  2019/4/18
  */
-class FirstHomeFragment : BaseFragment() {
+class FirstHomeFragment : BaseFragment(), HomeListItemHolder.HomeItemListener {
 
     companion object {
         private const val BANNER_TIME = 3000L
@@ -50,6 +53,12 @@ class FirstHomeFragment : BaseFragment() {
 
     private lateinit var firstHomeVM: FirstHomeViewModel
 
+    private val collectArticleVM: CollectArticleViewModel by lazy {
+        //todo 为什么第一种方案实现不了
+//        ViewModelProvider(this).get(CollectArticleViewModel::class.java)
+        ViewModelProviders.of(this).get(CollectArticleViewModel::class.java)
+    }
+
     private val onRefreshListener = SwipeRefreshLayout.OnRefreshListener {
         refreshData()
     }
@@ -64,7 +73,10 @@ class FirstHomeFragment : BaseFragment() {
     }
 
     init {
-        listHolderBuilder.add(HomeListItemHolder::class.java)
+        listHolderBuilder
+                .add(HomeListItemHolder::class.java) { holder ->
+                    holder.homeItemListener = this
+                }
                 .add(EmptyHolder::class.java)
                 .add(BannerLayoutHolder::class.java)
     }
@@ -78,6 +90,7 @@ class FirstHomeFragment : BaseFragment() {
 
         val mainView = inflater.inflate(R.layout.fragment_first_home_layout, container, false)
         homeListRecyclerView = mainView.findViewById(R.id.home_recycler_view)!!
+        mainView.post { }
         return mainView
     }
 
@@ -108,6 +121,9 @@ class FirstHomeFragment : BaseFragment() {
      * 初始化 VM
      */
     private fun bindViewModel() {
+
+        //todo 为什么会失败呢
+//        firstHomeVM = ViewModelProvider(this).get(FirstHomeViewModel::class.java)
         firstHomeVM = ViewModelProviders.of(this).get(FirstHomeViewModel::class.java)
 
         // banner 成功的 监听
@@ -138,10 +154,10 @@ class FirstHomeFragment : BaseFragment() {
             home_swipe_refresh.isRefreshing = false
         }
 
-        firstHomeVM.bannerUILD.observe(this, bannerLDObserver)
-        firstHomeVM.bannerEmptyLD.observe(this, bannerEmptyLDObserver)
-        firstHomeVM.articleLD.observe(this, articleListObserver)
-        firstHomeVM.articleEmptyLD.observe(this, articleEmptyAndErrorObserver)
+        firstHomeVM.bannerUILD.observe(viewLifecycleOwner, bannerLDObserver)
+        firstHomeVM.bannerEmptyLD.observe(viewLifecycleOwner, bannerEmptyLDObserver)
+        firstHomeVM.articleLD.observe(viewLifecycleOwner, articleListObserver)
+        firstHomeVM.articleEmptyLD.observe(viewLifecycleOwner, articleEmptyAndErrorObserver)
     }
 
     /**
@@ -210,5 +226,16 @@ class FirstHomeFragment : BaseFragment() {
     private fun loadMoreData() {
         val page = homeListAdapter.list.size / 20 + 1
         firstHomeVM.getArticleList(page)
+    }
+
+    override fun onCollectViewClicked(articleId: Int, originId: Int, isCollected: Boolean, handleResult: (Boolean) -> Unit) {
+        if (isCollected) {
+            // 如果已经收藏过，则是取消收藏
+            collectArticleVM.unCollectArticle(articleId, originId, handleResult)
+        } else {
+            // 未收藏过，则需要调用收藏接口
+//            firstHomeVM.collectArticle(articleId, handleResult)
+            collectArticleVM.collectArticle(articleId, handleResult)
+        }
     }
 }

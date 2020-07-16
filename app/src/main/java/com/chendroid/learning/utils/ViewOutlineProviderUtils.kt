@@ -14,6 +14,9 @@ import kotlinx.coroutines.channels.Channel
  */
 object ViewOutlineProviderUtils {
 
+    /**
+     * 为当前 view 设置四周圆角
+     */
     @JvmStatic
     fun setRoundCorner(roundView: View, radiusPx: Int) {
         roundView.clipToOutline = true
@@ -22,6 +25,8 @@ object ViewOutlineProviderUtils {
                 outline.setRoundRect(0, 0, view.width, view.height, radiusPx.toFloat())
             }
         }
+        // 刷新
+        roundView.invalidateOutline()
     }
 
     /**
@@ -37,7 +42,7 @@ object ViewOutlineProviderUtils {
         }
 
         // 只刷新轮廓
-//        roundView.invalidateOutline()
+        roundView.invalidateOutline()
     }
 
 }
