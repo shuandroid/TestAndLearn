@@ -80,5 +80,6 @@ class FirstMainActivity : BaseActivity() {
     override fun attachBaseContext(newBase: Context?) {
         // 在这可修改 context
         super.attachBaseContext(newBase)
+        lifecycle
     }
 }

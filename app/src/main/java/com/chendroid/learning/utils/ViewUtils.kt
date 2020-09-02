@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.PixelCopy
 import android.view.View
 import androidx.annotation.RequiresApi
+import com.chendroid.learning.TLApplication
 import java.lang.Exception
 
 /**

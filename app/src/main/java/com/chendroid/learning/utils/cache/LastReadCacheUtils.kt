@@ -44,7 +44,6 @@ object LastReadCacheUtils {
     }
 
 
-
     val list1 = ArrayList<Int>()
     val list2 = ArrayList<Int>(20)
 

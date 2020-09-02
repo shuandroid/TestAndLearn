@@ -65,7 +65,7 @@
 
         <attr name="tagStatus" format="enum">
             <enum name="status_default" value="0"/>
-            <enum name="status_selected" value="1"/>
+            <enum name="status_selected" value="1"/>fa
             <enum name="status_un_enable" value="2"/>
             <enum name="status_just_show" value="3"/>
             <enum name="status_dialog_style" value="4"/>

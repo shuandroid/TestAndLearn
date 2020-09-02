@@ -53,6 +53,11 @@ class AccountInfoActivity : BaseActivity() {
 
     private lateinit var contentView: DragConstraintLayout
 
+    val testView: View by lazy {
+        View(applicationContext)
+    }
+
+
     /**
      * 是否登陆
      */
@@ -119,10 +124,12 @@ class AccountInfoActivity : BaseActivity() {
      * 绑定 viewModel
      */
     private fun bindViewModel() {
+
         accountViewModel = ViewModelProviders.of(this).get(AccountViewModel::class.java)
 
-        // todo liveData 监听. 如果逻辑复杂的话，需要拆出来 Presenter  去处理这些逻辑
 
+        // todo liveData 监听. 如果逻辑复杂的话，需要拆出来 Presenter  去处理这些逻辑
+        viewModelStore
         val loginDataObserver = Observer<LoginResponse> {
             loginLayout.visibility = View.GONE
             userNameView.text = it.data.username
@@ -191,11 +198,7 @@ class AccountInfoActivity : BaseActivity() {
      */
     private fun handleBitmap(bitmap: Bitmap) {
 
-        Log.i("zc_test", "AccountInfoActivity handleBitmap bitmap is" + bitmap)
-
         targetBitmap = bitmap
-//        customDragAvatarView.targetBitmap = this.targetBitmap
-
         contentView.setTestTargetBitmap(this.targetBitmap)
     }
 

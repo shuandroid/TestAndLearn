@@ -13,6 +13,4 @@ class CircleImageView constructor(context: Context, attrs: AttributeSet? = null,
     : AppCompatImageView(context, attrs, defStyleAttr) {
 
 
-
-
 }

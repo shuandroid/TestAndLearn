@@ -3,6 +3,7 @@ package com.chendroid.learning.widget.view
 import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.graphics.*
@@ -12,11 +13,9 @@ import android.os.Vibrator
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
-import android.view.VelocityTracker
 import android.view.View
 import android.view.ViewConfiguration
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.chendroid.learning.utils.ViewUtils
@@ -62,56 +61,42 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
 
     lateinit var targetBitmap: Bitmap
 
-    var bitmapPaint: Paint
-
-    // 第二个残影的 bitmap 画笔
-    var secondAlphaPaint: Paint
+    // 绘制 bitmap 的画笔
+    private var bitmapPaint: Paint
 
     // 第一个 bitmap 的坐标
     var firstX = 0F
     var firstY = 0F
     var secondX = 0F
     var secondY = 0F
-
     var thirdX = 0F
     var thirdY = 0F
 
-    // 缩放因子
-    var moveValue = 0f
-
-    // 手势移动速度追踪， 用于计算速度
-    var velocityTracker: VelocityTracker? = null
-
-    // 速度, 向左移动，则 xEventVelocity < 0, 向右移动，则 xEventVelocity > 0
-    var xEventVelocity = 0f
-
-    //速度, 向上移动，则 yEventVelocity < 0, 向下移动，则 yEventVelocity > 0
-    var yEventVelocity = 0f
-
-    var count = 1
-
-
-    var firstAnimator: ValueAnimator? = null
-    var secondAnimatorSet: AnimatorSet? = null
+    // 用作
+    var secondAnimator: ValueAnimator? = null
     var thirdAnimator: ValueAnimator? = null
+
+    // 用来记录拖拽的路径，list
+    private val positionXList = ArrayList<Float>()
+    private val positionYList = ArrayList<Float>()
+
+    var startSecondPosition = 0
+    var endSecondPosition = 0
+
+    var startThirdPosition = 0
+    var endThirdPosition = 0
 
     init {
 
         apply {
+            // ConstraintLayout 默认不会拦截事件，需要设置 isClickable = true
             isClickable = true
         }
 
-        bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-
-        bitmapPaint.style = Paint.Style.FILL
-        setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-
-        secondAlphaPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        secondAlphaPaint.apply {
+        bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.FILL
-            alpha = (255 * (0.6)).toInt()
         }
-
+        setLayerType(View.LAYER_TYPE_SOFTWARE, null)
     }
 
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
@@ -121,8 +106,6 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             if (!ViewUtils.isTouchEventInTargetView(event, targetDragView)) {
                 mTouchDownX = event.x
                 mTouchDownY = event.y
-                val result = super.onInterceptTouchEvent(event)
-                Log.i("zc_test", "TestConstraintLayout onInterceptTouchEvent result is $result ")
                 return false
             }
         }
@@ -137,13 +120,8 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             }
             MotionEvent.ACTION_MOVE -> {
                 // 判断是否符合移动的条件
-
                 delta = sqrt((mTouchDownX - event.x.toDouble()).pow(2.0) + (mTouchDownY - event.y.toDouble()).pow(2.0)).toInt()
-                Log.i("zc_test", "mTouchDownX is $mTouchDownX, and x is ${event.x}, and mTouchDownY is $mTouchDownY, and y is ${event.y}")
-                Log.i("zc_test", "scaledTouchSlop is ${ViewConfiguration.get(context).scaledTouchSlop}, and delta is $delta")
                 mScrolling = delta >= ViewConfiguration.get(context).scaledTouchSlop
-
-                Log.i("zc_test", "TestConstraintLayout onInterceptTouchEvent ACTION_MOVE mScrolling is $mScrolling")
             }
             MotionEvent.ACTION_UP -> mScrolling = false
         }
@@ -153,12 +131,12 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         return mScrolling
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         Log.i("zc_test", "TestConstraintLayout onTouchEvent")
         // down 的时候判断
         if (event.action == MotionEvent.ACTION_DOWN) {
             if (!ViewUtils.isTouchEventInTargetView(event, targetDragView)) {
-
                 Log.i("zc_test", "TestConstraintLayout  onTouchEvent 不拦截")
                 mTouchDownX = event.x
                 mTouchDownY = event.y
@@ -167,18 +145,6 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
                 return result
             }
         }
-
-//        isClickable = true
-
-        // 用不到
-//        if (velocityTracker == null) {
-//            velocityTracker = VelocityTracker.obtain()
-//        }
-//
-//        velocityTracker?.run {
-//            // 添加进当前事件
-//            addMovement(event)
-//        }
 
         val delta: Int
         when (event.action) {
@@ -192,7 +158,6 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
 
             MotionEvent.ACTION_MOVE -> run {
 
-//                Log.i("zc_test", "onTouchEvent() ACTION_MOVE ")
                 if (!mIsCanMove) {
                     //
                     return@run
@@ -202,6 +167,7 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
                     //不满足对滑动距离的判断，则直接返回
                     return@run
                 }
+                // 满足滑动
                 Log.i("zc_test", "onTouchEvent() ACTION_MOVE 符合滑动 ")
                 mScrolling = true
 
@@ -213,26 +179,26 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
                     mPrevY = event.rawY
                     mFirstEventX = event.rawX
                     mFirstEventY = event.rawY
-
                     firstX = mFirstX
                     firstY = mFirstY
-
                     secondX = mFirstX
                     secondY = mFirstY
-
                     thirdX = mFirstX
                     thirdY = mFirstY
+                    mCurX = mFirstX
+                    mCurY = mFirstY
 
                     isFirstMove = false
                 }
+
+                positionXList.add(mCurX)
+                positionYList.add(mCurY)
 
                 val deltaX = event.rawX - mFirstEventX
                 val deltaY = event.rawY - mFirstEventY
 
                 mPrevX = mCurX
                 mPrevY = mCurY
-
-                count++
 
                 mCurX = mFirstX + deltaX
                 mCurY = mFirstY + deltaY
@@ -257,8 +223,19 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         return touchEventResult
     }
 
+    /**
+     * 设置目标 view , 并从中获取到 bitmap
+     */
     fun setTargetView(view: View) {
         targetDragView = view
+
+        // todo 能不能把 activity 简化～
+        targetDragView.post {
+//            ViewUtils.fetchBitmapFromView(targetDragView, this) { bitmap ->
+////                handleBitmap(bitmap)
+//                setTestTargetBitmap(bitmap)
+//            }
+        }
     }
 
     fun setTestTargetBitmap(bitmap: Bitmap) {
@@ -298,62 +275,24 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         // 设置它为不可见
         targetDragView.visibility = View.INVISIBLE
 
-        Log.i("zc_test", "handleDragMoving 这里 mCurX is $mCurX, mPrevX  is $mPrevX， mCurY is $mCurY，mPrevY is $mCurY  ")
-
         if (mCurX == mPrevX && mCurY == mPrevY) {
             // 悬停时，不刷新
             return
         }
 
-        // 第一个 bitmap 设置动画
-        startFirstBitmapAnimator()
-
-        startSecondBitmapAnimator()
-
-        startThirdBitmapAnimator()
+        test1()
+        test2()
+        test3()
     }
 
-    private fun startFirstBitmapAnimator() {
-        // 第一个 bitmap 的动画
-        firstAnimator?.run {
-            if (isRunning) {
-                return
-            } else {
-                removeAllListeners()
-                cancel()
-            }
-        }
-
-        val animatorStartX = firstX
-        val animatorStartY = firstY
-
-        firstAnimator = ValueAnimator.ofFloat(0F, 1F)
-
-        firstAnimator?.addUpdateListener {
-            if (firstX == mCurX && firstY == mCurY) {
-                firstAnimator?.apply {
-                    removeAllListeners()
-                    cancel()
-                }
-                firstAnimator?.cancel()
-                return@addUpdateListener
-            }
-            firstX = (it.animatedValue as Float) * (mCurX - animatorStartX) + animatorStartX
-            firstY = (it.animatedValue as Float) * (mCurY - animatorStartY) + animatorStartY
-        }
-
-        firstAnimator?.apply {
-            interpolator = LinearInterpolator()
-            duration = 25
-        }
-
-        firstAnimator?.start()
+    private fun test1() {
+        firstX = mCurX
+        firstY = mCurY
     }
 
-    // 第二个 bitmap 的绘制在这里改变
-    private fun startSecondBitmapAnimator() {
+    private fun test2() {
         // 使用动画
-        secondAnimatorSet?.run {
+        secondAnimator?.run {
             // 如果正在运行，则不影响它的运行，下次再开启动画
             if (isRunning) {
                 return
@@ -363,48 +302,57 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             cancel()
         }
 
-        val animatorStartX = secondX
-        val animatorStartY = secondY
+        endSecondPosition = positionXList.size
         // 这样不和谐
         val targetX = mCurX
         val targetY = mCurY
-        secondAnimatorSet = AnimatorSet()
-
-        val xSecondValueAnimator = ValueAnimator.ofFloat(0F, 1F)
-        xSecondValueAnimator?.addUpdateListener {
+        secondAnimator = ValueAnimator.ofInt(startSecondPosition, endSecondPosition)
+        secondAnimator?.addUpdateListener {
 
             if (secondX == targetX && secondY == targetY) {
-                secondAnimatorSet?.apply {
+                secondAnimator?.apply {
                     removeAllListeners()
                     cancel()
                 }
                 return@addUpdateListener
             }
 
-            if (secondX == mCurX && secondY == mCurY) {
-                secondAnimatorSet?.apply {
+            if (positionXList.size < it.animatedValue as Int) {
+                secondAnimator?.apply {
                     removeAllListeners()
                     cancel()
                 }
                 return@addUpdateListener
             }
-            secondX = (it.animatedValue as Float) * (targetX - animatorStartX) + animatorStartX
-            secondY = (it.animatedValue as Float) * (targetY - animatorStartY) + animatorStartY
-//            invalidate()
+
+            secondX = positionXList[it.animatedValue as Int]
+            secondY = positionYList[it.animatedValue as Int]
         }
 
-        secondAnimatorSet?.run {
-            playTogether(xSecondValueAnimator)
+        secondAnimator?.addListener(object :Animator.AnimatorListener {
+            override fun onAnimationRepeat(animation: Animator?) {
+            }
+
+            override fun onAnimationEnd(animation: Animator?) {
+                startSecondPosition = endSecondPosition
+            }
+
+            override fun onAnimationCancel(animation: Animator?) {
+                startSecondPosition = endSecondPosition
+            }
+
+            override fun onAnimationStart(animation: Animator?) {
+            }
+        })
+
+        secondAnimator?.apply {
             interpolator = AccelerateDecelerateInterpolator()
             duration = 75
-        }
 
-        secondAnimatorSet?.start()
+        }?.start()
     }
 
-    // 开启第三个 bitmap 位置计算
-    private fun startThirdBitmapAnimator() {
-
+    private fun test3() {
         // 使用动画
         thirdAnimator?.run {
             // 如果正在运行，则不影响它的运行，下次再开启动画
@@ -417,11 +365,8 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
 
         val targetX = mCurX
         val targetY = mCurY
-
-        val animatorStartX = thirdX
-        val animatorStartY = thirdY
-
-        thirdAnimator = ValueAnimator.ofFloat(0F, 1F)
+        endThirdPosition = positionXList.size
+        thirdAnimator = ValueAnimator.ofInt(startThirdPosition, endThirdPosition)
         thirdAnimator?.addUpdateListener {
 
             if (thirdX == targetX && thirdY == targetY) {
@@ -432,45 +377,54 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
                 return@addUpdateListener
             }
 
-            if (thirdX == mCurX && thirdY == mCurY) {
-                thirdAnimator?.apply {
-                    removeAllListeners()
-                    cancel()
-                }
-                return@addUpdateListener
-            }
-            thirdX = (it.animatedValue as Float) * (targetX - animatorStartX) + animatorStartX
-            thirdY = (it.animatedValue as Float) * (targetY - animatorStartY) + animatorStartY
+            thirdX = positionXList[it.animatedValue as Int]
+            thirdY = positionYList[it.animatedValue as Int]
             invalidate()
         }
-        // todo 动画时间有待继续调整
-        thirdAnimator?.run {
+
+        thirdAnimator?.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationRepeat(animation: Animator?) {
+            }
+
+            override fun onAnimationEnd(animation: Animator?) {
+                startThirdPosition = endThirdPosition
+            }
+
+            override fun onAnimationCancel(animation: Animator?) {
+                startThirdPosition = endThirdPosition
+            }
+
+            override fun onAnimationStart(animation: Animator?) {
+            }
+        })
+
+        thirdAnimator?.apply {
             interpolator = AccelerateDecelerateInterpolator()
             duration = 125
-        }
+        }?.start()
 
         thirdAnimator?.start()
     }
+
 
     /**
      * 拖拽结束
      */
     private fun handleDragOver() {
+        // 如果不是在滑动中，则不需要执行后续操作
+        if (!mScrolling) {
+            return
+        }
+
         mScrolling = false
         isResettingView = true
-        clearStartAnimator()
-        resetAnimator()
+        clearDragingAnimator()
+        startResetAnimator()
     }
 
     // 清除所有开始动画
-    private fun clearStartAnimator() {
-
-        firstAnimator?.run {
-            removeAllListeners()
-            cancel()
-        }
-
-        secondAnimatorSet?.run {
+    private fun clearDragingAnimator() {
+        secondAnimator?.run {
             removeAllListeners()
             cancel()
         }
@@ -482,27 +436,31 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     }
 
     // 恢复原来位置动画, 基本没问题
-    private fun resetAnimator() {
+    private fun startResetAnimator() {
 
-        val mostXValue = mCurX
-        val mostYValue = mCurY
-        val xValueAnimator = ValueAnimator.ofFloat(mostXValue, targetDragView.x)
-        val yValueAnimator = ValueAnimator.ofFloat(mostYValue, targetDragView.y)
+        val startXValue = mCurX
+        val startYValue = mCurY
+
+        val offsetX = targetDragView.x - mCurX
+
+        val xValueAnimator = ValueAnimator.ofFloat(0F, 1F)
+        val yValueAnimator = ValueAnimator.ofFloat(startYValue, targetDragView.y)
 
         xValueAnimator.addUpdateListener {
-            mCurX = (it.animatedValue as Float)
+            firstX = (it.animatedValue as Float) * offsetX + startXValue
+
             // 刷新界面
 //            invalidate()
         }
 
         yValueAnimator.addUpdateListener {
-            mCurY = (it.animatedValue as Float)
+            firstY = (it.animatedValue as Float)
         }
 
-        secondX = mostXValue
-        secondY = mostYValue
-        val secondXValueAnimator = ValueAnimator.ofFloat(mostXValue, targetDragView.x)
-        val secondYValueAnimator = ValueAnimator.ofFloat(mostYValue, targetDragView.y)
+        secondX = startXValue
+        secondY = startYValue
+        val secondXValueAnimator = ValueAnimator.ofFloat(startXValue, targetDragView.x)
+        val secondYValueAnimator = ValueAnimator.ofFloat(startYValue, targetDragView.y)
         secondXValueAnimator.addUpdateListener {
             secondX = ((it.animatedValue as Float))
 //            invalidate()
@@ -518,10 +476,10 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         animatorSet2.duration = 500
 
         // 第三个
-        thirdX = mostXValue
-        thirdY = mostYValue
-        val thirdXValueAnimator = ValueAnimator.ofFloat(mostXValue, targetDragView.x)
-        val thirdYValueAnimator = ValueAnimator.ofFloat(mostYValue, targetDragView.y)
+        thirdX = startXValue
+        thirdY = startYValue
+        val thirdXValueAnimator = ValueAnimator.ofFloat(startXValue, targetDragView.x)
+        val thirdYValueAnimator = ValueAnimator.ofFloat(startYValue, targetDragView.y)
         thirdXValueAnimator.addUpdateListener {
             thirdX = ((it.animatedValue as Float))
             invalidate()
@@ -548,9 +506,7 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             }
 
             override fun onAnimationEnd(animation: Animator?) {
-
-                isResettingView = false
-                targetDragView.visibility = View.VISIBLE
+                resetData()
             }
 
             override fun onAnimationCancel(animation: Animator?) {
@@ -570,6 +526,20 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         }, 100)
     }
 
+    private fun resetData() {
+        isResettingView = false
+        targetDragView.visibility = View.VISIBLE
+        mCurX = targetDragView.x
+        mCurY = targetDragView.y
+        startSecondPosition = 0
+        startThirdPosition = 0
+        endSecondPosition = 0
+        endThirdPosition = 0
+        positionXList.clear()
+        positionYList.clear()
+    }
+
+    // 在这里绘制 bitmap
     override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
 
@@ -585,9 +555,8 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             canvas.drawBitmap(targetBitmap, firstX, firstY, bitmapPaint)
         }
 
-        // 恢复这里是没问题的
+        // 复位 view 时的操作
         if (isResettingView) {
-            // 复位 view 时的操作
             // 第三个 bitmap
             bitmapPaint.alpha = (255 * (0.5)).toInt()
             canvas.drawBitmap(targetBitmap, thirdX, thirdY, bitmapPaint)
@@ -596,7 +565,8 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             canvas.drawBitmap(targetBitmap, secondX, secondY, bitmapPaint)
             // 第一个 bitmap
             bitmapPaint.alpha = 255
-            canvas.drawBitmap(targetBitmap, mCurX, mCurY, bitmapPaint)
+            canvas.drawBitmap(targetBitmap, firstX, firstY, bitmapPaint)
+
         }
     }
 
@@ -609,14 +579,13 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         val vibrator = context.getSystemService(Service.VIBRATOR_SERVICE) as Vibrator
 
         // 需要添加权限  uses-permission
-        vibrator?.run {
+        vibrator.run {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 vibrate(VibrationEffect.createOneShot(30L, VibrationEffect.DEFAULT_AMPLITUDE))
             } else {
                 vibrate(30L)
             }
         }
-
     }
 
 }
