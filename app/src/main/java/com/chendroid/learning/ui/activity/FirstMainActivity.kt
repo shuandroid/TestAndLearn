@@ -2,10 +2,12 @@ package com.chendroid.learning.ui.activity
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import androidx.fragment.app.Fragment
 import com.chendroid.learning.R
 import com.chendroid.learning.base.BaseActivity
+import com.chendroid.learning.base.Preference
 import com.chendroid.learning.extension.openAccount
 import com.chendroid.learning.ui.adapter.FirstMainPagerAdapter
 import com.chendroid.learning.ui.fragment.FirstHomeFragment
@@ -81,5 +83,41 @@ class FirstMainActivity : BaseActivity() {
         // 在这可修改 context
         super.attachBaseContext(newBase)
         lifecycle
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // 测试大量写入 SharedPreference 时，会在 onPause 中等待 QueuedWork.waitToFinish()
+        // 可能会产生 ANR
+//        Handler().postDelayed({
+//            //
+//            Log.i("zc_test", "FirstMainActivity  onResume  延迟")
+//
+//            for (i in 0..50000) {
+//                var test : String by  Preference("test_onresume", "")
+//                test = "$i"
+//            }
+//
+//        }, 1000)
+    }
+
+    override fun onPause() {
+        Log.i("zc_test", "FirstMainActivity pre onPause ")
+        super.onPause()
+        Log.i("zc_test", "FirstMainActivity after onPause ")
+    }
+
+    override fun onStop() {
+        Log.i("zc_test", "FirstMainActivity pre onStop ")
+        super.onStop()
+        Log.i("zc_test", "FirstMainActivity pre onStop ")
+
+    }
+
+    override fun onDestroy() {
+        Log.i("zc_test", "FirstMainActivity pre onDestroy ")
+        super.onDestroy()
+        Log.i("zc_test", "FirstMainActivity after onDestroy ")
     }
 }

@@ -126,30 +126,20 @@ class LearnTest {
     }
 
     // 生成长度为n的int型随机数组，数组元素范围为0~n-1，每个元素都是唯一的。只使用基本数据类型。
-    private static void test(int [] targetNum, int n) {
+    private static void test(int[] targetNum, int n) {
 //        int[] targetNum = new int[n];
-        for(int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++) {
             targetNum[i] = i;
         }
         //0 1 2 3 4...n-1
-        for (int i = targetNum.length-1; i > 0; i--) {
-            int r = new Random().nextInt(i+1);
+        for (int i = targetNum.length - 1; i > 0; i--) {
+            int r = new Random().nextInt(i + 1);
             System.out.println(r);
             int tmp = targetNum[i];
             targetNum[i] = targetNum[r];
             targetNum[r] = tmp;
         }
 
-    }
-
-    public static void main(String[] args) {
-//        Scanner cin = new Scanner(System.in);
-//        int n = cin.nextInt();
-        int[] arr = new int[10];
-        test(arr, 10);
-        for (int i = 0; i < arr.length; i++) {
-            System.out.print(arr[i] + " ");
-        }
     }
 
     // 层序遍历二叉树，遍历的过程中保存最大值
@@ -163,7 +153,7 @@ class LearnTest {
         while (!linkedList.isEmpty()) {
             int max = Integer.MIN_VALUE;    //保存最大值
             int size = linkedList.size();   //size表示上一层节点的数目
-            for (int i = 0;i < size;i++) {  //遍历上层节点（在此过程中，每个节点的值与最大值做比较，并将下层节点添加进来）
+            for (int i = 0; i < size; i++) {  //遍历上层节点（在此过程中，每个节点的值与最大值做比较，并将下层节点添加进来）
                 TreeNode node = linkedList.pollLast();
                 if (node.value > max) {   //如果节点的值大于max，更新max
                     max = node.value;
@@ -184,55 +174,85 @@ class LearnTest {
         return result;
     }
 
+    private static void testListToTwo(ListNode node) {
 
-
-    private void test (int carNum, int[] a) {
-        // 表明此时没有货物，不需要卡车
-        if (a.length <= 0 ) {
+        if (node == null) {
             return;
         }
-        // 此时货物的数量小于卡车的数量，题意不符合；
-        if (a.length < carNum) {
-            return;
+        // 头
+        ListNode head = node.nextNode;
+        // 奇数
+        ListNode temp1 = node;
+        ListNode first = temp1;
+        // 偶数
+        ListNode temp2 = node.nextNode;
+        ListNode first2 = temp2;
+        while (temp1 != null && temp2 != null && temp1.nextNode != null && temp2.nextNode != null) {
+            temp1.nextNode = temp1.nextNode.nextNode;
+            temp2.nextNode = temp2.nextNode.nextNode;
+            temp1 = temp1.nextNode;
+            temp2 = temp2.nextNode;
+        }
+        // 前面为奇数，后面为偶数
+//        temp1.nextNode = head;
+
+        // return node 为完整的一条链表；
+
+//        while (node != null) {
+////            System.out.println(node.value);
+////            node = node.nextNode;
+////        }
+        // 需要设置 temp1.nextNode = null;
+        while (first != null) {
+            System.out.println("enenen 第一个");
+            System.out.println(first.value);
+            first = first.nextNode;
+        }
+        while (first2 != null) {
+            System.out.println("enenen 第二个");
+            System.out.println(first2.value);
+            first2 = first2.nextNode;
         }
 
-        // offset 表示每辆卡车必须装载一件货物后，剩余的货物数量
-        int offset = a.length - carNum;
-        // 把剩余的货物全放在一辆车上，该车会有 offset + 1 件货物；
-        // 并且它的所有的货物的价值都是在该数组中 a[] 是价值大的货物
+    }
 
-        // 对数组 a 排序, 价值大的放在前面；，只需要筛选出前 offset + 1 个货物
+    public static void main(String[] args) {
 
-        // 晒选条件变成
-        for (int i = 0; i < offset + 1; i++) {
-            for (int j = i + 1; j < a.length; j++) {
-                //
-                if (a[i] < a[j]){
-                    // 交换位置
-                    // i[k] 和 i[k+1] 交换
-                    int temp;
-                    temp = a[j];
-                    a[j] = a[i];
-                    a[i] = temp;
-                }
-            }
-        }
+//        ListNode node1 = new ListNode();
+//        node1.value = 1;
+//        ListNode node2 = new ListNode();
+//        node2.value = 2;
+//        ListNode node3 = new ListNode();
+//        node3.value = 3;
+//        ListNode node4 = new ListNode();
+//        node4.value = 4;
+//
+//        ListNode node5 = new ListNode();
+//        node5.value = 5;
+//
+//        ListNode node6 = new ListNode();
+//        node6.value = 6;
+//
+//        node1.nextNode = node2;
+//        node2.nextNode = node3;
+//        node3.nextNode = node4;
+//        node4.nextNode = node5;
+//        node5.nextNode = node6;
+//
+//        testListToTwo(node1);
 
-        // 此时数组 a 中，前 offset + 1 个 是价值大的货物；
-        // count 表示前 offset + 1 的总和
-        int count = 0;
-        for (int i = 0; i < offset + 1; i++) {
-            count = count + a[i];
-        }
 
-        //
-        // max 用来存储最大的价值, 平方;
-        int max = count * count;
-
+        TestString testString = new TestString();
+        testString.setTest(null);
 
     }
 
 
+    private void intTest() {
+        int test = Integer.parseInt("34");
+        List<Integer> intLoist = new ArrayList<>();
+
+    }
 
 
 
