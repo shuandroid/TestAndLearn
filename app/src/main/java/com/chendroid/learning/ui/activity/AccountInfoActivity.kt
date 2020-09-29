@@ -71,6 +71,7 @@ class AccountInfoActivity : BaseActivity() {
     private lateinit var todoTagView: TagView
 
     override fun setLayoutId(): Int {
+        // test for test
         return R.layout.activity_account_info
     }
 
