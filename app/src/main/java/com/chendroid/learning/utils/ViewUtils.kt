@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.PixelCopy
 import android.view.View
+import android.view.Window
 import androidx.annotation.RequiresApi
 import com.chendroid.learning.TLApplication
 import java.lang.Exception
@@ -24,9 +25,9 @@ object ViewUtils {
      * getDrawingCache 被抛弃，使用 PixelCopy
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    fun fetchBitmapFromView(view: View, activity: Activity, callback: (Bitmap) -> Unit) {
+    fun fetchBitmapFromView(view: View, window: Window, callback: (Bitmap) -> Unit) {
 
-        if (activity.window == null) {
+        if (window == null) {
             return
         }
 
@@ -41,7 +42,7 @@ object ViewUtils {
 
         try {
             PixelCopy
-                    .request(activity.window!!, Rect(locationOfViewInWindow[0],
+                    .request(window, Rect(locationOfViewInWindow[0],
                             locationOfViewInWindow[1],
                             locationOfViewInWindow[0] + view.width,
                             locationOfViewInWindow[1] + view.height),

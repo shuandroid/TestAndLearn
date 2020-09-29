@@ -3,6 +3,7 @@ package com.chendroid.learning.widget.view
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Service
 import android.content.Context
 import android.graphics.*
@@ -214,12 +215,14 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     fun setTargetView(view: View) {
         targetDragView = view
 
-        // todo 能不能把 activity 简化～
+        if (targetDragView.visibility == View.GONE) {
+            return
+        }
+
         targetDragView.post {
-//            ViewUtils.fetchBitmapFromView(targetDragView, this) { bitmap ->
-////                handleBitmap(bitmap)
-//                setTestTargetBitmap(bitmap)
-//            }
+            ViewUtils.fetchBitmapFromView(targetDragView, (context as Activity).window ) { bitmap ->
+                setTestTargetBitmap(bitmap)
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.chendroid.learning.data.usecase
 
+import android.util.Log
 import com.chendroid.care.data.Result
 import com.chendroid.care.util.safeApiCall
 import com.chendroid.learning.api.ApiServiceHelper
@@ -30,6 +31,7 @@ class LoginAccountUseCase {
         val loginResult = service.loginAccount(username, password)
 
         if (loginResult.isSuccessful) {
+            Log.i("zc_test", "登陆成功啦 ～ body is" + loginResult.body())
             loginResult.body()?.data?.run {
                 return Result.Success(loginResult.body()!!)
             }

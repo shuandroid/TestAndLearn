@@ -59,7 +59,7 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun loginAccountReally(username: String, password: String) {
-
+        Log.i("zc_test", "loginAccountReally")
         viewModelScope.launch(IO) {
 
             val loginResult = loginAccountUseCase.loginAccount(username, password)

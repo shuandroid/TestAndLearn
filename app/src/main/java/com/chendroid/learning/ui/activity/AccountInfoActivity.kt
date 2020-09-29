@@ -53,11 +53,6 @@ class AccountInfoActivity : BaseActivity() {
 
     private lateinit var contentView: DragConstraintLayout
 
-    val testView: View by lazy {
-        View(applicationContext)
-    }
-
-
     /**
      * 是否登陆
      */
@@ -129,13 +124,18 @@ class AccountInfoActivity : BaseActivity() {
 
 
         // todo liveData 监听. 如果逻辑复杂的话，需要拆出来 Presenter  去处理这些逻辑
-        viewModelStore
         val loginDataObserver = Observer<LoginResponse> {
+            Log.i("zc_test", "这里调用")
             loginLayout.visibility = View.GONE
             userNameView.text = it.data.username
             it.data.icon?.run {
                 userAvatarView.setImageURI(this)
             }
+
+            userAvatarView.visibility = View.VISIBLE
+            todoTagView.visibility = View.VISIBLE
+            account_collect.visibility = View.VISIBLE
+
             saveLoginData(it.data)
         }
 
@@ -173,9 +173,9 @@ class AccountInfoActivity : BaseActivity() {
         loginPasswordView = login_password_text
         loginConfirmButton = login_confirm_button
 
-        initNotLoginLayout()
-
         initAccountView()
+
+        initNotLoginLayout()
 
         initDragAvatarView()
 
@@ -186,11 +186,11 @@ class AccountInfoActivity : BaseActivity() {
     private fun initDragAvatarView() {
 //        customDragAvatarView = custom_drag_avatar_view
 
-        userAvatarView.post {
-            ViewUtils.fetchBitmapFromView(userAvatarView, this) { bitmap ->
-                handleBitmap(bitmap)
-            }
-        }
+//        userAvatarView.postDelayed( {
+//            ViewUtils.fetchBitmapFromView(userAvatarView, window) { bitmap ->
+//                handleBitmap(bitmap)
+//            }
+//        }, 100)
     }
 
     /**
@@ -199,7 +199,7 @@ class AccountInfoActivity : BaseActivity() {
     private fun handleBitmap(bitmap: Bitmap) {
 
         targetBitmap = bitmap
-        contentView.setTestTargetBitmap(this.targetBitmap)
+//        contentView.setTestTargetBitmap(this.targetBitmap)
     }
 
     /**
@@ -212,6 +212,10 @@ class AccountInfoActivity : BaseActivity() {
             userNameView.text = username
             return
         }
+
+        userAvatarView.visibility = View.GONE
+        todoTagView.visibility = View.GONE
+        account_collect.visibility = View.GONE
 
         loginConfirmButton.setOnClickListener {
             // 登陆
