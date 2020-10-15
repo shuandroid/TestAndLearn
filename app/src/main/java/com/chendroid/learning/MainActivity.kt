@@ -2,10 +2,13 @@ package com.chendroid.learning
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.ViewGroup
 import android.widget.Button
 import com.chendroid.learning.base.BaseActivity
 import com.chendroid.learning.ui.activity.FirstMainActivity
 import com.chendroid.learning.ui.activity.TryEveryThingActivity
+import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {

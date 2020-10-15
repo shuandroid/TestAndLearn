@@ -180,6 +180,9 @@ class AccountInfoActivity : BaseActivity() {
         initDragAvatarView()
 
         contentView.setTargetView(userAvatarView)
+        userAvatarView.setOnClickListener {
+            Log.d("zc_test", "外部设置 点击了点击了 click")
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
