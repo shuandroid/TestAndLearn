@@ -305,7 +305,7 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
                 return@addUpdateListener
             }
 
-            if (positionXList.size < it.animatedValue as Int) {
+            if (positionXList.size <= it.animatedValue as Int) {
                 secondAnimator?.apply {
                     removeAllListeners()
                     cancel()
