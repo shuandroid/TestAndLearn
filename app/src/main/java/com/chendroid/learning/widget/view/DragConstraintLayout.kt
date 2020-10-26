@@ -4,12 +4,8 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Service
 import android.content.Context
 import android.graphics.*
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -17,6 +13,7 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
+import androidx.annotation.NonNull
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.chendroid.learning.utils.ViewUtils
 import kotlin.math.pow
@@ -40,12 +37,11 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     private var mPrevY = 0f
     private var mCurX = 0f
     private var mCurY = 0f
-
-    private var mFirstEventX = 0f
-    private var mFirstEventY = 0f
+    private var firstMoveEventX = 0f
+    private var firstMoveEventY = 0f
 
     // 是否在拖动的标识位
-    private var mScrolling = false
+    private var isScrolling = false
 
     // 是否正在重设 view 位置
     private var isResettingView = false
@@ -53,18 +49,18 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     // 对多个手指做处理的标识位
     private var mIsCanMove = false
 
-    // 是否是单一的手指触发
-    private var isSingleFingerTouch = false
-
     // 是否为第一次移动
     private var isFirstMove = true
 
     private lateinit var targetDragView: View
-
-    lateinit var targetBitmap: Bitmap
+    private lateinit var targetBitmap: Bitmap
 
     // 绘制 bitmap 的画笔
-    private var bitmapPaint: Paint
+    private val bitmapPaint: Paint by lazy {
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.FILL
+        }
+    }
 
     // 第二个，第三个 bitmap 的位置
     private var secondX = 0F
@@ -72,7 +68,7 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     private var thirdX = 0F
     private var thirdY = 0F
 
-    // 用作
+    // 用作第二个第三个残影动画
     private var secondAnimator: ValueAnimator? = null
     private var thirdAnimator: ValueAnimator? = null
 
@@ -84,28 +80,28 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     private var startSecondPosition = 0
     private var endSecondPosition = 0
 
+    // 第三个 bitmap 开始从 List 中取坐标的 start, end 值
     private var startThirdPosition = 0
     private var endThirdPosition = 0
 
     init {
-        apply {
-            // ConstraintLayout 默认不会拦截事件，需要设置 isClickable = true
-            isClickable = true
-        }
-        bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.FILL
-        }
+        // ConstraintLayout 默认不会拦截事件，需要设置 isClickable = true
+        isClickable = true
         setLayerType(View.LAYER_TYPE_SOFTWARE, null)
     }
 
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
+        if (targetDragView == null) {
+            return super.onInterceptTouchEvent(event)
+        }
+
         // delta 为移动的距离
         val delta: Int
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 mTouchDownX = event.x
                 mTouchDownY = event.y
-                mScrolling = false
+                isScrolling = false
                 if (ViewUtils.isTouchEventInTargetView(event, targetDragView)) {
                     mIsCanMove = true
                 } else {
@@ -116,13 +112,13 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             MotionEvent.ACTION_MOVE -> {
                 // 判断是否符合移动的条件
                 delta = sqrt((mTouchDownX - event.x.toDouble()).pow(2.0) + (mTouchDownY - event.y.toDouble()).pow(2.0)).toInt()
-                mScrolling = delta >= ViewConfiguration.get(context).scaledTouchSlop
+                isScrolling = delta >= ViewConfiguration.get(context).scaledTouchSlop
             }
-            MotionEvent.ACTION_UP -> mScrolling = false
+            MotionEvent.ACTION_UP -> isScrolling = false
         }
 
-        Log.i("zc_test", "TestConstraintLayout onInterceptTouchEvent scroll is $mScrolling")
-        if (mScrolling) {
+        Log.i("zc_test", "TestConstraintLayout onInterceptTouchEvent scroll is $isScrolling")
+        if (isScrolling) {
             targetDragView?.run {
                 isClickable = false
             }
@@ -139,13 +135,12 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> run {
                 mTouchDownX = event.x
                 mTouchDownY = event.y
-                mScrolling = false
+                isScrolling = false
                 Log.i("zc_test", "onTouchEvent() mIsCanMove is $mIsCanMove")
             }
 
             MotionEvent.ACTION_MOVE -> run {
-
-                if (!mIsCanMove) {
+                if (!mIsCanMove || !isFirstFingerTouch(event)) {
                     return@run
                 }
 
@@ -156,23 +151,24 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
                 }
 
                 if (isFirstMove) {
-                    mFirstEventX = event.rawX
-                    mFirstEventY = event.rawY
-
-                    secondX = targetDragView.x
-                    secondY = targetDragView.y
-                    thirdX = targetDragView.x
-                    thirdY = targetDragView.y
-                    mCurX = targetDragView.x
-                    mCurY = targetDragView.y
+                    firstMoveEventX = event.rawX
+                    firstMoveEventY = event.rawY
+                    targetDragView.run {
+                        secondX = x
+                        secondY = y
+                        thirdX = x
+                        thirdY = y
+                        mCurX = x
+                        mCurY = y
+                    }
                     isFirstMove = false
                 }
 
                 positionXList.add(mCurX)
                 positionYList.add(mCurY)
 
-                val deltaX = event.rawX - mFirstEventX
-                val deltaY = event.rawY - mFirstEventY
+                val deltaX = event.rawX - firstMoveEventX
+                val deltaY = event.rawY - firstMoveEventY
 
                 mPrevX = mCurX
                 mPrevY = mCurY
@@ -188,8 +184,8 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
                 handleDragOver()
                 isFirstMove = true
                 mIsCanMove = false
-                if (mScrolling) {
-                    mScrolling = false
+                if (isScrolling) {
+                    isScrolling = false
                     return true
                 }
             }
@@ -203,13 +199,11 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     /**
      * 设置目标 view , 并从中获取到 bitmap
      */
-    fun setTargetView(view: View) {
+    fun setTargetView(@NonNull view: View) {
         targetDragView = view
-
         if (targetDragView.visibility == View.GONE) {
             return
         }
-
         targetDragView.post {
             ViewUtils.fetchBitmapFromView(targetDragView, (context as Activity).window) { bitmap ->
                 setTestTargetBitmap(bitmap)
@@ -218,7 +212,7 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     }
 
     /**
-     * 设置对应的目标 bitmap
+     * 设置对应的目标 bitmap, 并转化成圆形的 bitmap
      */
     private fun setTestTargetBitmap(bitmap: Bitmap) {
 
@@ -226,15 +220,14 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         val circleBitmap = Bitmap.createBitmap(targetDragView.width, targetDragView.height, Bitmap.Config.ARGB_8888)
         // 画布
         val testCanvas = Canvas(circleBitmap)
-
         // 设置画笔
-        val testPaint = Paint()
-        testPaint.isAntiAlias = true
+        val testPaint = Paint().apply {
+            isAntiAlias = true
+        }
 
-        //
+        // 转化为圆形
         testCanvas.drawCircle((targetDragView.width / 2).toFloat(), (targetDragView.height / 2).toFloat(), (targetDragView.width / 2).toFloat(), testPaint)
         testPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-
         testCanvas.drawBitmap(bitmap, 0F, 0F, testPaint)
         // 把原来的方形 bitmap 设置成了圆形的 bitmap
         targetBitmap = circleBitmap
@@ -243,8 +236,6 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
 
     /**
      * 只处理第一个手指的 touch event，防止多点触控引起的问题
-     *
-     * @return true if the
      */
     private fun isFirstFingerTouch(event: MotionEvent): Boolean {
         return event.getPointerId(event.actionIndex) == 0
@@ -256,7 +247,7 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     private fun handleDragMoving() {
         // 设置它为不可见
         targetDragView.visibility = View.INVISIBLE
-        mScrolling = true
+        isScrolling = true
 
 //        // todo 待处理，清理 list 数据 clearAndUpdateList()
 //        if ((mCurX == mPrevX && mCurY == mPrevY) && (secondX == mCurX && secondY == mCurY) && (thirdX == mCurX && thirdY == mCurY)) {
@@ -296,7 +287,6 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             if (isRunning) {
                 return
             }
-
             removeAllListeners()
             cancel()
         }
@@ -417,18 +407,18 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
      */
     private fun handleDragOver() {
         // 如果不是在滑动中，则不需要执行后续操作
-        if (!mScrolling) {
+        if (!isScrolling) {
             return
         }
 
-        mScrolling = false
+        isScrolling = false
         isResettingView = true
-        clearDragingAnimator()
+        clearDraggingAnimator()
         startResetAnimator()
     }
 
     // 清除所有开始动画
-    private fun clearDragingAnimator() {
+    private fun clearDraggingAnimator() {
         secondAnimator?.run {
             removeAllListeners()
             cancel()
@@ -445,7 +435,6 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
 
         val startXValue = mCurX
         val startYValue = mCurY
-
         val offsetX = targetDragView.x - mCurX
         val offsetY = targetDragView.y - mCurY
 
@@ -494,6 +483,7 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             }
 
             override fun onAnimationCancel(animation: Animator?) {
+                resetData()
             }
 
             override fun onAnimationStart(animation: Animator?) {
@@ -506,7 +496,9 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
 
         postDelayed({
             // 延迟 100 ms 后进行震动
-            startVibrateEffect()
+            context?.run {
+                ViewUtils.startVibrateEffect(this)
+            }
         }, 100)
     }
 
@@ -514,6 +506,7 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
      * 重设各个变量的初始值
      */
     private fun resetData() {
+        isScrolling = false
         isResettingView = false
         targetDragView.visibility = View.VISIBLE
         mCurX = targetDragView.x
@@ -537,7 +530,7 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
 
-        if (mScrolling) {
+        if (isScrolling) {
             // 绘画第二个第三个 bitmap
             bitmapPaint.alpha = (255 * (0.65)).toInt()
             canvas.drawBitmap(targetBitmap, thirdX, thirdY, bitmapPaint)
@@ -562,22 +555,12 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         }
     }
 
-    // 开启震动效果
-    private fun startVibrateEffect() {
-        if (context == null) {
-            return
-        }
-
-        val vibrator = context.getSystemService(Service.VIBRATOR_SERVICE) as Vibrator
-
-        // 需要添加权限  uses-permission
-        vibrator.run {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrate(VibrationEffect.createOneShot(30L, VibrationEffect.DEFAULT_AMPLITUDE))
-            } else {
-                vibrate(30L)
-            }
-        }
+    /**
+     * 销毁资源，释放资源
+     */
+    fun destroyView() {
+        clearDraggingAnimator()
+        resetData()
     }
 
 }

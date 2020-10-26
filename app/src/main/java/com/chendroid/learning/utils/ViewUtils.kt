@@ -1,10 +1,14 @@
 package com.chendroid.learning.utils
 
 import android.app.Activity
+import android.app.Service
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.os.Build
 import android.os.Handler
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.Log
 import android.view.MotionEvent
 import android.view.PixelCopy
@@ -93,6 +97,21 @@ object ViewUtils {
         Log.i("zc_test", "inAvatarViewInterval return true ")
 
         return true
+    }
+
+    // 开启震动效果
+    fun startVibrateEffect(context: Context) {
+
+        val vibrator = context.getSystemService(Service.VIBRATOR_SERVICE) as Vibrator
+
+        // 需要添加权限  uses-permission
+        vibrator.run {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrate(VibrationEffect.createOneShot(30L, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                vibrate(30L)
+            }
+        }
     }
 
 }

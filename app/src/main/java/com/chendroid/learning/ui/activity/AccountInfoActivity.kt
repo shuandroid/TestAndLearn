@@ -18,10 +18,9 @@ import com.chendroid.learning.R
 import com.chendroid.learning.base.BaseActivity
 import com.chendroid.learning.base.Preference
 import com.chendroid.learning.bean.LoginResponse
-import com.chendroid.learning.utils.ViewUtils
 import com.chendroid.learning.vm.AccountViewModel
-import com.chendroid.learning.widget.view.TagView
 import com.chendroid.learning.widget.view.DragConstraintLayout
+import com.chendroid.learning.widget.view.TagView
 import com.facebook.drawee.view.SimpleDraweeView
 import kotlinx.android.synthetic.main.activity_account_info.*
 import kotlinx.android.synthetic.main.activity_login_layout.*
@@ -34,7 +33,6 @@ import toast
  */
 class AccountInfoActivity : BaseActivity() {
 
-
     private lateinit var loginLayout: View
     private lateinit var userNameView: TextView
     private lateinit var userAvatarView: SimpleDraweeView
@@ -42,8 +40,6 @@ class AccountInfoActivity : BaseActivity() {
     private lateinit var loginNameView: AppCompatEditText
     private lateinit var loginPasswordView: AppCompatEditText
     private lateinit var loginConfirmButton: Button
-
-//    private lateinit var customDragAvatarView: CustomDragView
 
     private lateinit var toolbar: Toolbar
 
@@ -241,5 +237,9 @@ class AccountInfoActivity : BaseActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        contentView.destroyView()
+    }
 
 }
