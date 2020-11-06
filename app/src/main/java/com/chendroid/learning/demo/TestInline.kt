@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
  * @since 2019-10-23
  */
 
- fun main(args: Array<String>) {
+fun main(args: Array<String>) {
 ////    Log.i("zc_test", "main() start")
 //    println("zc_test\", \"main() start")
 //    val test = TestInline()
@@ -76,7 +76,7 @@ class TestInline() {
 
     }
 
-    class TreeNode () {
+    class TreeNode() {
         val parent: TreeNode = TreeNode()
     }
 

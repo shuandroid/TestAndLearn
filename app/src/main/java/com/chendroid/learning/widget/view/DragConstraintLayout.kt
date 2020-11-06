@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.*
+import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -14,6 +15,7 @@ import android.view.ViewConfiguration
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import androidx.annotation.NonNull
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.chendroid.learning.utils.ViewUtils
 import kotlin.math.pow
@@ -26,7 +28,6 @@ import kotlin.math.sqrt
  */
 class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
     : ConstraintLayout(context, attrs, defStyleAttr) {
-
     // 第一次手势 down, 按下时的 x, y 位置
     private var mTouchDownX = 0f
     private var mTouchDownY = 0f
@@ -53,12 +54,13 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     private var isFirstMove = true
 
     private lateinit var targetDragView: View
-    private lateinit var targetBitmap: Bitmap
+    private var targetBitmap: Bitmap? = null
 
     // 绘制 bitmap 的画笔
     private val bitmapPaint: Paint by lazy {
         Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.FILL
+            alpha = 255
         }
     }
 
@@ -91,7 +93,7 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     }
 
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
-        if (targetDragView == null) {
+        if (targetDragView == null || targetBitmap == null) {
             return super.onInterceptTouchEvent(event)
         }
 
@@ -111,7 +113,11 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             }
             MotionEvent.ACTION_MOVE -> {
                 // 判断是否符合移动的条件
-                delta = sqrt((mTouchDownX - event.x.toDouble()).pow(2.0) + (mTouchDownY - event.y.toDouble()).pow(2.0)).toInt()
+                delta = sqrt(
+                        (mTouchDownX - event.x.toDouble()).pow(2.0) + (mTouchDownY - event.y.toDouble()).pow(
+                                2.0
+                        )
+                ).toInt()
                 isScrolling = delta >= ViewConfiguration.get(context).scaledTouchSlop
             }
             MotionEvent.ACTION_UP -> isScrolling = false
@@ -144,7 +150,11 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
                     return@run
                 }
 
-                delta = sqrt((mTouchDownX - event.x.toDouble()).pow(2.0) + (mTouchDownY - event.y.toDouble()).pow(2.0)).toInt()
+                delta = sqrt(
+                        (mTouchDownX - event.x.toDouble()).pow(2.0) + (mTouchDownY - event.y.toDouble()).pow(
+                                2.0
+                        )
+                ).toInt()
                 if (delta < ViewConfiguration.get(context).scaledTouchSlop) {
                     //不满足对滑动距离的判断，则直接返回
                     return@run
@@ -199,16 +209,19 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     /**
      * 设置目标 view , 并从中获取到 bitmap
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     fun setTargetView(@NonNull view: View) {
         targetDragView = view
         if (targetDragView.visibility == View.GONE) {
             return
         }
-        targetDragView.post {
+        // 延迟 1s 是发现在某些机型上，第一次进入界面后，拖拽时显示不出 bitmap,
+        // 报错为：E/DRM/DcfDecoder: decodeDrmImageIfNeeded stream ， 暂未找到原因
+        targetDragView.postDelayed({
             ViewUtils.fetchBitmapFromView(targetDragView, (context as Activity).window) { bitmap ->
                 setTestTargetBitmap(bitmap)
             }
-        }
+        }, 1000)
     }
 
     /**
@@ -217,7 +230,11 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
     private fun setTestTargetBitmap(bitmap: Bitmap) {
 
         // 圆形 bitmap ，与原 bitmap 一样大小
-        val circleBitmap = Bitmap.createBitmap(targetDragView.width, targetDragView.height, Bitmap.Config.ARGB_8888)
+        val circleBitmap = Bitmap.createBitmap(
+                targetDragView.width,
+                targetDragView.height,
+                Bitmap.Config.ARGB_8888
+        )
         // 画布
         val testCanvas = Canvas(circleBitmap)
         // 设置画笔
@@ -226,7 +243,12 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         }
 
         // 转化为圆形
-        testCanvas.drawCircle((targetDragView.width / 2).toFloat(), (targetDragView.height / 2).toFloat(), (targetDragView.width / 2).toFloat(), testPaint)
+        testCanvas.drawCircle(
+                (targetDragView.width / 2).toFloat(),
+                (targetDragView.height / 2).toFloat(),
+                (targetDragView.width / 2).toFloat(),
+                testPaint
+        )
         testPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
         testCanvas.drawBitmap(bitmap, 0F, 0F, testPaint)
         // 把原来的方形 bitmap 设置成了圆形的 bitmap
@@ -249,7 +271,7 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         targetDragView.visibility = View.INVISIBLE
         isScrolling = true
 
-//        // todo 待处理，清理 list 数据 clearAndUpdateList()
+//        // todo 待处理悬停状态下，清理 list 数据 clearAndUpdateList()
 //        if ((mCurX == mPrevX && mCurY == mPrevY) && (secondX == mCurX && secondY == mCurY) && (thirdX == mCurX && thirdY == mCurY)) {
 //            Log.i("zc_test", "handleDragMoving() 可以清理坐标数据")
 //            secondAnimator?.run {
@@ -271,7 +293,7 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
         calculateThirdBitmapPosition()
     }
 
-    // todo 需要找个时机，当悬停时，需要清空 list , 丢弃一些历史数据；
+    // todo 需要找个时机，当悬停时，需要清空 list , 丢弃一些历史数据，防止 ，list 过大；
     private fun clearAndUpdateList() {
         Log.i("TestConstraintLayout", "clearAndUpdateList()")
         positionXList.clear()
@@ -428,6 +450,13 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
             removeAllListeners()
             cancel()
         }
+
+        positionXList.clear()
+        positionYList.clear()
+        startSecondPosition = 0
+        endSecondPosition = 0
+        startThirdPosition = 0
+        endSecondPosition = 0
     }
 
     // 恢复原来位置动画, 基本没问题
@@ -529,29 +558,36 @@ class DragConstraintLayout @JvmOverloads constructor(context: Context, attrs: At
      */
     override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
+        if (targetBitmap == null) {
+            return
+        }
 
         if (isScrolling) {
-            // 绘画第二个第三个 bitmap
-            bitmapPaint.alpha = (255 * (0.65)).toInt()
-            canvas.drawBitmap(targetBitmap, thirdX, thirdY, bitmapPaint)
-            bitmapPaint.alpha = (255 * (0.85)).toInt()
-            canvas.drawBitmap(targetBitmap, secondX, secondY, bitmapPaint)
-            // 第一个，最上面的 bitmap
-            bitmapPaint.alpha = 255
-            canvas.drawBitmap(targetBitmap, mCurX, mCurY, bitmapPaint)
+            targetBitmap?.run {
+                // 绘画第二个第三个 bitmap
+                bitmapPaint.alpha = (255 * (0.65)).toInt()
+                canvas.drawBitmap(this, thirdX, thirdY, bitmapPaint)
+                bitmapPaint.alpha = (255 * (0.85)).toInt()
+                canvas.drawBitmap(this, secondX, secondY, bitmapPaint)
+                // 第一个，最上面的 bitmap
+                bitmapPaint.alpha = 255
+                canvas.drawBitmap(this, mCurX, mCurY, bitmapPaint)
+            }
         }
 
         // 复位 view 时的操作
         if (isResettingView) {
-            // 第三个 bitmap
-            bitmapPaint.alpha = (255 * (0.65)).toInt()
-            canvas.drawBitmap(targetBitmap, thirdX, thirdY, bitmapPaint)
-            // 第二个 bitmap
-            bitmapPaint.alpha = (255 * (0.85)).toInt()
-            canvas.drawBitmap(targetBitmap, secondX, secondY, bitmapPaint)
-            // 第一个 bitmap
-            bitmapPaint.alpha = 255
-            canvas.drawBitmap(targetBitmap, mCurX, mCurY, bitmapPaint)
+            targetBitmap?.run {
+                // 第三个 bitmap
+                bitmapPaint.alpha = (255 * (0.65)).toInt()
+                canvas.drawBitmap(this, thirdX, thirdY, bitmapPaint)
+                // 第二个 bitmap
+                bitmapPaint.alpha = (255 * (0.85)).toInt()
+                canvas.drawBitmap(this, secondX, secondY, bitmapPaint)
+                // 第一个 bitmap
+                bitmapPaint.alpha = 255
+                canvas.drawBitmap(this, mCurX, mCurY, bitmapPaint)
+            }
         }
     }
 

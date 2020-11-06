@@ -3,9 +3,6 @@ package com.chendroid.learning.utils
 import android.graphics.Outline
 import android.view.View
 import android.view.ViewOutlineProvider
-import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.channels.Channel
 
 /**
  * @intro 给 `View` 通过  ViewOutlineProvider 设置圆角的工具类
@@ -16,6 +13,7 @@ object ViewOutlineProviderUtils {
 
     /**
      * 为当前 view 设置四周圆角
+     * radiusPx ， 设置圆角的半径，单位是 px
      */
     @JvmStatic
     fun setRoundCorner(roundView: View, radiusPx: Int) {

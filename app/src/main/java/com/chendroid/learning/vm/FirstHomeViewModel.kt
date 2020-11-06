@@ -1,7 +1,6 @@
 package com.chendroid.learning.vm
 
 import android.app.Application
-import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
