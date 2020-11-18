@@ -20,9 +20,12 @@
         <module name="processor" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.7">
       <module name="annotation" target="1.7" />
       <module name="processor" target="1.7" />
+      <module name="TestAndLearn.app" target="11" />
+      <module name="TestAndLearn.core" target="11" />
+      <module name="TestAndLearn.demo" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -42,7 +42,6 @@ class FirstHomeFragment : BaseFragment(), HomeListItemHolder.HomeItemListener {
     // 真正用来存在文章列表需要的数据
     private val articleList: MutableList<Any> = mutableListOf()
 
-
     private var listHolderBuilder: SugarAdapter.Builder = SugarAdapter.Builder.with(articleList)
 
     private val homeListAdapter by lazy {
@@ -80,8 +79,6 @@ class FirstHomeFragment : BaseFragment(), HomeListItemHolder.HomeItemListener {
                 .add(EmptyHolder::class.java)
                 .add(BannerLayoutHolder::class.java)
     }
-
-
     // 取消网络请求
     override fun cancelRequest() {
     }

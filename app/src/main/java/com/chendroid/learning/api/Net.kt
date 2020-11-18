@@ -26,7 +26,6 @@ object Net {
     private val mServiceMap = ConcurrentHashMap<Class<*>, Any>()
     private val mWrapperScheduler = Schedulers.from(WrapperExecutor())
 
-
     private val sRetrofit by lazy {
         val builder = Retrofit.Builder()
         val okHttpClientBuilder = OkHttpClient().newBuilder()
@@ -52,7 +51,6 @@ object Net {
     }
 
     private fun createWrapperService(retrofit: Retrofit, service: Class<Any>): Any {
-
         return Proxy.newProxyInstance(service.classLoader, arrayOf<Class<*>>(service), object : InvocationHandler {
             override fun invoke(proxy: Any, method: Method, args: Array<out Any>): Any {
 
