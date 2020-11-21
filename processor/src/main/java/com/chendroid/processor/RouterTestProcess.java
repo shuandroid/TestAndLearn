@@ -15,10 +15,9 @@ import javax.lang.model.element.TypeElement;
 
 /**
  * @author zhaochen@ZhiHu Inc.
- * @intro
+ * @intro 测试注解的工程
  * @since 2020/6/22
  */
-
 @AutoService(Processor.class)
 class RouterTestProcess extends AbstractProcessor {
 
@@ -50,9 +49,6 @@ class RouterTestProcess extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-
-
-
         return false;
     }
 }

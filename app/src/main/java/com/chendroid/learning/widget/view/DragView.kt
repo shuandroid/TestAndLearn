@@ -25,7 +25,6 @@ import kotlin.math.sqrt
 class DragView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
     : ConstraintLayout(context, attrs, defStyleAttr) {
 
-
     // 是否在滑动的标识位
     private var mScrolling = false
 

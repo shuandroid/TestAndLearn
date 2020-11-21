@@ -24,7 +24,6 @@ interface NewWanService {
     @GET("/article/list/{page}/json")
     suspend fun getArticleList(@Path("page") page: Int): Response<HomeListResponse>
 
-
     /**
      * 登陆
      */
@@ -59,7 +58,6 @@ interface NewWanService {
     @GET("/lg/todo/v2/list/{page_num}/json")
     suspend fun getTodoList(@Path("page_num") @IntRange(from = 1) pageNum: Int, @QueryMap queryMap: Map<String, Int>? = null): Response<TodoData>
 
-
     @POST("/lg/todo/add/json")
     @FormUrlEncoded
     suspend fun addNewTodo(@Field("title") title: String, @Field("content") content: String,
@@ -67,5 +65,4 @@ interface NewWanService {
 
     @GET("/tree/json")
     suspend fun getArticleTypeList(): Response<TagListResponse>
-
 }

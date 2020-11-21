@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.max
 
 /**
- * @intro 封装网络库的基本使用
+ * @intro 封装网络库的基本使用, 未使用
  * @author zhaochen@ZhiHu Inc.
  * @since 2019-08-12
  */
@@ -111,7 +111,6 @@ object Net {
 
         })
     }
-
 
     /**
      * RetrofitWrapper 用的 Executor

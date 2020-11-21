@@ -30,21 +30,19 @@ object ApiServiceHelper {
     val newWanService = getService(Constant.REQUEST_BASE_URL, NewWanService::class.java)
 
     private fun create(url: String): Retrofit {
-        val okHttpClientBuilder = OkHttpClient().newBuilder().apply {
 
+        val okHttpClientBuilder = OkHttpClient().newBuilder().apply {
+            // 最大链接时间
             connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
             readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
-
             /**
              * 添加拦截器，获取 cookie
              */
             addInterceptor(SaveCookieInterceptor())
-
             /**
              * 添加 cookie
              */
             addInterceptor(AddCookieInterceptor())
-
             // add log print 调试时可用于查看网络请求的 message 信息
             if (Constant.INTERCEPTOR_ENABLE) {
                 // loggingInterceptor
@@ -72,9 +70,7 @@ object ApiServiceHelper {
      * get ServiceApi
      */
     private fun <T> getService(url: String, service: Class<T>): T = create(url).create(service)
-
 }
-
 
 /**
  *  创建 Retrofit.Builder
@@ -83,7 +79,6 @@ class RetrofitBuilder(
         url: String, client: OkHttpClient,
         gsonFactory: GsonConverterFactory,
         coroutineCallAdapterFactory: CoroutineCallAdapterFactory) {
-
     val retrofit: Retrofit = Retrofit.Builder().apply {
         baseUrl(url)
         client(client)

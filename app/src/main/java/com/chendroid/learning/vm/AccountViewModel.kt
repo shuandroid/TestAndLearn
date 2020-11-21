@@ -54,32 +54,26 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
      * 登录，需要账号和密码
      */
     fun loginAccount(username: String, password: String) {
-
         loginAccountReally(username, password)
     }
 
     private fun loginAccountReally(username: String, password: String) {
         Log.i("zc_test", "loginAccountReally")
         viewModelScope.launch(IO) {
-
             val loginResult = loginAccountUseCase.loginAccount(username, password)
 
             if (loginResult is Result.Success) {
                 Log.i("zc_test", "$TAG loginAccountReally() 成功")
-
                 withContext(Main) {
                     vmLoginDataLD.value = loginResult.data
                 }
-
             } else if (loginResult is Result.Error) {
                 Log.i("zc_test", "$TAG loginAccountReally() 失败")
                 withContext(Main) {
                     vmLoginErrorLD.value = loginResult.exception
                 }
             }
-
         }
-
     }
 
 }

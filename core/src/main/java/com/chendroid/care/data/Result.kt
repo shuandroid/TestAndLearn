@@ -7,9 +7,8 @@ import java.lang.Exception
  * @author zhaochen@ZhiHu Inc.
  * @since 2019-10-30
  */
-//密封，保证在包内被调用
 sealed class Result<out T : Any> {
-
+    // sealed 密封，使它的子类，只能在当前内部才能声明， 便于使用 when.
     /**
      * 请求成功的数据类
      */
