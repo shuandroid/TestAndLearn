@@ -3,6 +3,7 @@ package com.chendroid.learning.ui.activity
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.chendroid.learning.R
@@ -19,30 +20,17 @@ import kotlinx.android.synthetic.main.activity_todo.*
  * @author zhaochen@ZhiHu Inc.
  * @since 2020/5/15
  */
-class TodoActivity : BaseActivity() {
+class TodoActivity : AppCompatActivity() {
 
     private lateinit var toolbar: Toolbar
-
     private lateinit var fabTodoView: FloatingActionButton
 
-    override fun setLayoutId(): Int {
-        return R.layout.activity_todo
-    }
-
-    override fun cancelRequest() {
-    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
-//        val exit = Materialc
-
         super.onCreate(savedInstanceState)
-
+        setContentView(R.layout.activity_todo)
         initView()
         initToolbar()
         initViewPager()
-        initImmersionBar()
     }
 
     private fun initView() {
@@ -60,22 +48,6 @@ class TodoActivity : BaseActivity() {
         toolbar = todo_toolbar
         toolbar.title = "ToDo 列表"
         setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        toolbar.setOnClickListener {
-            finish()
-        }
-
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
-
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
-    }
-
-    override fun initImmersionBar() {
-        super.initImmersionBar()
-        immersionBar.titleBar(R.id.todo_toolbar).init()
     }
 
     private fun initViewPager() {
@@ -95,9 +67,6 @@ class TodoActivity : BaseActivity() {
         todo_tab_layout.isTabIndicatorFullWidth = false
     }
 
-    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        Log.i("zc_test", "todo activity dispatchTouchEvent ${ev.action}")
-        return super.dispatchTouchEvent(ev)
-    }
+
 
 }

@@ -19,10 +19,8 @@ sealed class Result<out T : Any> {
      */
     data class Error(val exception: Exception) : Result<Nothing>()
 
-
     override fun toString(): String {
-        return when(this) {
-            // todo 为什么加 <*>
+        return when (this) {
             is Success<*> -> "Success 请求成功 data=$data"
             is Error -> "Error 请求失败 exception=$exception"
         }

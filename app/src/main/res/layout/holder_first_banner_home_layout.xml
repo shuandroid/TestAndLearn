@@ -9,9 +9,8 @@
         android:id="@+id/home_banner_image"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
+        app:actualImageScaleType="centerCrop"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:roundedCornerRadius="6dp" />
+        app:layout_constraintRight_toRightOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

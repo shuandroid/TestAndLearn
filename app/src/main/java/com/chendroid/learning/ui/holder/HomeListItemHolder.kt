@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.lifecycle.ViewModelProvider
 import com.chendroid.learning.R
 import com.chendroid.learning.bean.BaseDatas
 import com.chendroid.learning.ui.activity.ContentDetailActivity
@@ -38,7 +37,6 @@ class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClic
         itemView.home_item_author
     }
 
-    //    private val authorTextView : TextView by lazy { view.findViewById<TextView>(R.id.home_item_author) }
     private val articleTitleView by lazy {
         itemView.home_item_title
     }
@@ -140,7 +138,6 @@ class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClic
 
             override fun onAnimationEnd(animation: Animator) {
                 super.onAnimationEnd(animation)
-
                 Log.i("zc_test", " animatorNewSet onAnimationEnd")
             }
         })
@@ -158,7 +155,6 @@ class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClic
     private fun collectArticle() {
 
 //        ViewModelProvider().get()
-
     }
 
     /**

@@ -79,18 +79,17 @@ class FirstHomeFragment : BaseFragment(), HomeListItemHolder.HomeItemListener {
                 .add(EmptyHolder::class.java)
                 .add(BannerLayoutHolder::class.java)
     }
+
     // 取消网络请求
     override fun cancelRequest() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
         val mainView = inflater.inflate(R.layout.fragment_first_home_layout, container, false)
         homeListRecyclerView = mainView.findViewById(R.id.home_recycler_view)!!
         mainView.post { }
         return mainView
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -100,7 +99,6 @@ class FirstHomeFragment : BaseFragment(), HomeListItemHolder.HomeItemListener {
             isRefreshing = true
             setOnRefreshListener(onRefreshListener)
         }
-
         homeListRecyclerView.apply {
             layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
             adapter = homeListAdapter
@@ -108,9 +106,7 @@ class FirstHomeFragment : BaseFragment(), HomeListItemHolder.HomeItemListener {
             // 设置 recyclerView item 分割条
             addItemDecoration(CustomItemDecoration.with(context))
         }
-
         bindViewModel()
-
         loadData()
     }
 
@@ -120,8 +116,8 @@ class FirstHomeFragment : BaseFragment(), HomeListItemHolder.HomeItemListener {
     private fun bindViewModel() {
 
         //todo 为什么会失败呢
-//        firstHomeVM = ViewModelProvider(this).get(FirstHomeViewModel::class.java)
-        firstHomeVM = ViewModelProviders.of(this).get(FirstHomeViewModel::class.java)
+        firstHomeVM = ViewModelProvider(this).get(FirstHomeViewModel::class.java)
+//        firstHomeVM = ViewModelProviders.of(this).get(FirstHomeViewModel::class.java)
 
         // banner 成功的 监听
         val bannerLDObserver = Observer<List<HomeBanner.BannerItemData>> {
@@ -179,11 +175,9 @@ class FirstHomeFragment : BaseFragment(), HomeListItemHolder.HomeItemListener {
 
     // 滚动时会调用该方法，去判断是否需要加载新的数据 loadMore
     private fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-
         if (dy == 0) {
             return
         }
-
         if (isScrollingTriggerLoadingMore(recyclerView) && canLoadMore()) {
             recyclerView.post { loadMoreData() }
         }
@@ -194,7 +188,6 @@ class FirstHomeFragment : BaseFragment(), HomeListItemHolder.HomeItemListener {
      */
     private fun isScrollingTriggerLoadingMore(recyclerView: RecyclerView): Boolean {
         val layoutManager = recyclerView.layoutManager
-
         layoutManager?.run {
             val totalItemCount = itemCount
             val lastVisibleItemPosition = if (this is LinearLayoutManager) {

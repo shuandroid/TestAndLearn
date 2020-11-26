@@ -10,9 +10,11 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.chendroid.learning.R
 import com.chendroid.learning.base.BaseActivity
@@ -31,7 +33,7 @@ import toast
  * @author zhaochen@ZhiHu Inc.
  * @since 2020-01-13
  */
-class AccountInfoActivity : BaseActivity() {
+class AccountInfoActivity : AppCompatActivity() {
 
     private lateinit var loginLayout: View
     private lateinit var userNameView: TextView
@@ -44,8 +46,6 @@ class AccountInfoActivity : BaseActivity() {
     private lateinit var toolbar: Toolbar
 
     private lateinit var accountViewModel: AccountViewModel
-
-    private lateinit var targetBitmap: Bitmap
 
     private lateinit var contentView: DragConstraintLayout
 
@@ -66,17 +66,10 @@ class AccountInfoActivity : BaseActivity() {
 
     private lateinit var todoTagView: TagView
 
-    override fun setLayoutId(): Int {
-        return R.layout.activity_account_info
-    }
-
-    override fun cancelRequest() {
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        setContentView(R.layout.activity_account_info)
         initToolbar()
         initView()
     }
@@ -89,15 +82,12 @@ class AccountInfoActivity : BaseActivity() {
         toolbar.title = "账户"
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
 
         toolbar.setNavigationOnClickListener {
             finish()
         }
-
     }
-
 
     override fun onStart() {
         super.onStart()
@@ -105,19 +95,12 @@ class AccountInfoActivity : BaseActivity() {
         bindViewModel()
     }
 
-    override fun initImmersionBar() {
-        super.initImmersionBar()
-
-        immersionBar.titleBar(R.id.account_toolbar).init()
-    }
-
     /**
      * 绑定 viewModel
      */
     private fun bindViewModel() {
 
-        accountViewModel = ViewModelProviders.of(this).get(AccountViewModel::class.java)
-
+        accountViewModel = ViewModelProvider(this).get(AccountViewModel::class.java)
 
         // todo liveData 监听. 如果逻辑复杂的话，需要拆出来 Presenter  去处理这些逻辑
         val loginDataObserver = Observer<LoginResponse> {
@@ -157,11 +140,7 @@ class AccountInfoActivity : BaseActivity() {
      */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initView() {
-
-        initImmersionBar()
-
         contentView = account_content_view
-
         loginLayout = account_login_layout_root
         userNameView = account_user_name
         userAvatarView = account_user_avatar
@@ -170,35 +149,12 @@ class AccountInfoActivity : BaseActivity() {
         loginConfirmButton = login_confirm_button
 
         initAccountView()
-
         initNotLoginLayout()
-
-        initDragAvatarView()
 
         contentView.setTargetView(userAvatarView)
         userAvatarView.setOnClickListener {
             Log.d("zc_test", "外部设置 点击了点击了 click")
         }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun initDragAvatarView() {
-//        customDragAvatarView = custom_drag_avatar_view
-
-//        userAvatarView.postDelayed( {
-//            ViewUtils.fetchBitmapFromView(userAvatarView, window) { bitmap ->
-//                handleBitmap(bitmap)
-//            }
-//        }, 100)
-    }
-
-    /**
-     * 得到 bitmap 后的动作
-     */
-    private fun handleBitmap(bitmap: Bitmap) {
-
-        targetBitmap = bitmap
-//        contentView.setTestTargetBitmap(this.targetBitmap)
     }
 
     /**

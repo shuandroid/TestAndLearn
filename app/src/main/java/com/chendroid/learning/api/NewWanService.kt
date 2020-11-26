@@ -25,6 +25,12 @@ interface NewWanService {
     suspend fun getArticleList(@Path("page") page: Int): Response<HomeListResponse>
 
     /**
+     * 获取某个作者分享的文章
+     */
+    @GET("/article/list/{page}?author={authorName}")
+    suspend fun getArticleListByAuthor(@Path("page") page: Int, @Query("authorName") authorName: String): Response<HomeListResponse>
+
+    /**
      * 登陆
      */
     @POST("/user/login")

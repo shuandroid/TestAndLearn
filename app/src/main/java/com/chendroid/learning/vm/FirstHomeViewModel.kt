@@ -77,12 +77,10 @@ class FirstHomeViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-
     /**
      * 获取首页 banner 信息
      */
     fun getBannerData() {
-
         viewModelScope.launch(IO) {
             val result = getBannerUseCase.getWanAndroidBanner()
             if (result is Result.Success) {

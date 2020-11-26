@@ -11,6 +11,7 @@ import com.chendroid.learning.R
 import com.chendroid.learning.bean.HomeBanner
 import com.chendroid.learning.ui.activity.ContentDetailActivity
 import com.chendroid.learning.utils.ViewOutlineProviderUtils
+import com.chendroid.learning.utils.setRoundCorner
 import com.zhihu.android.sugaradapter.Layout
 import com.zhihu.android.sugaradapter.SugarHolder
 import dp
@@ -36,8 +37,7 @@ class BannerHolder(view: View) : SugarHolder<HomeBanner.BannerItemData>(view), V
         if (!TextUtils.isEmpty(data.imagePath)) {
             imageView.setImageURI(data.imagePath)
         }
-
-//        ViewOutlineProviderUtils.setRoundCorner(itemView, 6.dp)
+        itemView.setRoundCorner(6)
     }
 
     override fun onClick(clickView: View) {

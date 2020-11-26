@@ -38,7 +38,6 @@ object ViewOutlineProviderUtils {
                 outline.setRoundRect(0, 0, view.width, view.height + radius, radius.toFloat())
             }
         }
-
         // 只刷新轮廓
         roundView.invalidateOutline()
     }
