@@ -46,7 +46,7 @@ class AccountInfoActivity : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
 
     private lateinit var accountViewModel: AccountViewModel
-
+    // 实现了可拖拽头像的父布局
     private lateinit var contentView: DragConstraintLayout
 
     /**
