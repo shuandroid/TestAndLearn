@@ -14,10 +14,11 @@ import com.chendroid.learning.data.source.FirstHomeWanDataSource
 import com.chendroid.learning.data.usecase.GetBannerUseCase
 import com.chendroid.learning.ui.holder.EmptyBannerData
 import com.chendroid.learning.ui.holder.data.EmptyData
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
 
 /**
  * @intro 首页的 ViewModel 处理数据类
@@ -135,6 +136,16 @@ class FirstHomeViewModel(application: Application) : AndroidViewModel(applicatio
             }
         }
     }
+
+//    val testStateFlow: StateFlow<List<BaseDatas>> =  flow {
+//
+//        val result = firstHomeWanRepo.getArticle(0)
+//        if (result is Result.Success) {
+//            emit(result.data.datas)
+//        } else if (result is Result.Error) {
+//            emit(null)
+//        }
+//    }.stateIn(viewModelScope)
 
     /**
      * 刷新文章列表

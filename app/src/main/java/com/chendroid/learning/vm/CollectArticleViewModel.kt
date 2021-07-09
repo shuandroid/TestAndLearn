@@ -27,7 +27,6 @@ class CollectArticleViewModel(application: Application) : AndroidViewModel(appli
     fun collectArticle(articleId: Int, handleResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val result = collectArticleRepo.collectArticle(articleId)
-
             if (result is Result.Success) {
                 withContext(Dispatchers.Main) {
                     handleResult(true)

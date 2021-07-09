@@ -23,9 +23,17 @@ allprojects {
     repositories {
         google()
         jcenter()
+        // 上传 aar 的 maven 地址
+//        maven { url "https://jitpack.io" }
     }
 }
 
 task clean(type: Delete) {
+    doFirst {
+        //
+    }
     delete rootProject.buildDir
+    doLast {
+        //
+    }
 }

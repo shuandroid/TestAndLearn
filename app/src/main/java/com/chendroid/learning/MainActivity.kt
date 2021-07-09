@@ -1,11 +1,17 @@
 package com.chendroid.learning
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
+import android.widget.Toast
 import com.chendroid.learning.base.BaseActivity
 import com.chendroid.learning.ui.activity.FirstMainActivity
 import com.chendroid.learning.ui.activity.TryEveryThingActivity
+import com.chendroid.learning.utils.DexUtil
+import com.permissionx.guolindev.PermissionX
+import dp
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {
@@ -14,11 +20,27 @@ class MainActivity : BaseActivity() {
         second_learning_button
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        findViewById<Button>(R.id.first_learning_button).setOnClickListener {
+        PermissionX.init(this)
+            .permissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            .onExplainRequestReason { scope, deniedList ->
+                scope.showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions", "OK", "Cancel")
+            }
+            .onForwardToSettings { scope, deniedList ->
+                scope.showForwardToSettingsDialog(deniedList, "You need to allow necessary permissions in Settings manually", "OK", "Cancel")
+            }
+            .request { allGranted, grantedList, deniedList ->
+                if (allGranted) {
+                    Toast.makeText(this, "All permissions are granted", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, "These permissions are denied: $deniedList", Toast.LENGTH_LONG).show()
+                }
+            }
 
+        findViewById<Button>(R.id.first_learning_button).setOnClickListener {
             // 跳转到第一个 activity
             startActivity(Intent(this, FirstMainActivity::class.java))
         }
@@ -37,6 +59,8 @@ class MainActivity : BaseActivity() {
         secondButton.setOnClickListener {
             startActivity(Intent(this, TryEveryThingActivity::class.java))
         }
+        Log.d("zc_test", "MainActivity, getTargetTest is ${TargetTest.getTestText()} ")
+        text_view.text = TargetTest.getTestText()
     }
 
     override fun setLayoutId(): Int {
@@ -44,6 +68,5 @@ class MainActivity : BaseActivity() {
     }
 
     override fun cancelRequest() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

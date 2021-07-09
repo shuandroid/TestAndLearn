@@ -17,6 +17,6 @@ versions.retrofit = "2.6.0"
 
 versions.support_version = "28.0.0"
 
-versions.kotlin_coroutines_version = "1.3.2"
+versions.kotlin_coroutines_version = "1.3.9"
 versions.converter_gson_version="2.1.0"
 
