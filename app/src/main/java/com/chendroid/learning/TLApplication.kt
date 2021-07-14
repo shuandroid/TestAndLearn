@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import com.chendroid.learning.base.Preference
 import com.chendroid.learning.utils.DexUtil
+import com.chendroid.preinflater.PreInflaterManager
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.stetho.Stetho
 import leakcanary.LeakCanary
@@ -45,6 +46,8 @@ class TLApplication : Application() {
         Preference.setContext(applicationContext)
         // TODO: 2021/7/9 暂时注释调，这里不使用他
 //        DexUtil.test(this)
+
+        PreInflaterManager.init(baseContext)
     }
 
 

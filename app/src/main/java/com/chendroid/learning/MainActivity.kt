@@ -1,19 +1,27 @@
 package com.chendroid.learning
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.asynclayoutinflater.view.AsyncLayoutInflater
+import com.chendroid.annotation.PreInflater
 import com.chendroid.learning.base.BaseActivity
 import com.chendroid.learning.ui.activity.FirstMainActivity
 import com.chendroid.learning.ui.activity.TryEveryThingActivity
 import com.chendroid.learning.utils.DexUtil
+import com.chendroid.preinflater.AsyncWrapperLayoutInflater
 import com.permissionx.guolindev.PermissionX
 import dp
 import kotlinx.android.synthetic.main.activity_main.*
 
+@PreInflater(layout = R2.layout.activity_main, scheduler = "io")
 class MainActivity : BaseActivity() {
 
     private val secondButton: Button by lazy {
@@ -25,18 +33,35 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         PermissionX.init(this)
-            .permissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            .permissions(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
             .onExplainRequestReason { scope, deniedList ->
-                scope.showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions", "OK", "Cancel")
+                scope.showRequestReasonDialog(
+                    deniedList,
+                    "Core fundamental are based on these permissions",
+                    "OK",
+                    "Cancel"
+                )
             }
             .onForwardToSettings { scope, deniedList ->
-                scope.showForwardToSettingsDialog(deniedList, "You need to allow necessary permissions in Settings manually", "OK", "Cancel")
+                scope.showForwardToSettingsDialog(
+                    deniedList,
+                    "You need to allow necessary permissions in Settings manually",
+                    "OK",
+                    "Cancel"
+                )
             }
             .request { allGranted, grantedList, deniedList ->
                 if (allGranted) {
                     Toast.makeText(this, "All permissions are granted", Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(this, "These permissions are denied: $deniedList", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this,
+                        "These permissions are denied: $deniedList",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
 
@@ -69,4 +94,10 @@ class MainActivity : BaseActivity() {
 
     override fun cancelRequest() {
     }
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(AsyncWrapperLayoutInflater.getInstance(newBase).wrapContext(newBase))
+
+    }
+
 }

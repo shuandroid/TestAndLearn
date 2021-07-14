@@ -19,7 +19,7 @@ import javax.lang.model.element.TypeElement;
  * @since 2020/6/22
  */
 
-@AutoService(Processor.class)
+//@AutoService(Processor.class)
 class RouterTestProcess extends AbstractProcessor {
 
     /**

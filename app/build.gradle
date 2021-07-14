@@ -16,6 +16,14 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
+        // 为注解生成,提供参数
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        moduleNameOfPreInflater: 'testmodule1'
+                ]
+            }
+        }
     }
 //    用来构建的，打不同的包
     buildTypes {
@@ -59,7 +67,7 @@ dependencies {
 
     implementation project(':core')
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.kotlin_coroutines_version}"
 
     implementation 'androidx.core:core-ktx:1.1.0'
@@ -115,6 +123,10 @@ dependencies {
     implementation 'com.permissionx.guolindev:permissionx:1.4.0'
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
+
+    api project(":preinflater")
+    api project(":annotation")
+    kapt project(":processor")
 
 }
 kotlin {

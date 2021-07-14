@@ -23,6 +23,7 @@ allprojects {
     repositories {
         google()
         jcenter()
+        mavenCentral()
         // 上传 aar 的 maven 地址
 //        maven { url "https://jitpack.io" }
     }
