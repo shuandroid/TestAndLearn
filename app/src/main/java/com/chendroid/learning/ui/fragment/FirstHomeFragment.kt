@@ -128,7 +128,6 @@ class FirstHomeFragment : BaseFragment(), HomeListItemHolder.HomeItemListener {
 
         // banner 成功的 监听
         val bannerLDObserver = Observer<List<HomeBanner.BannerItemData>> {
-
             val bannerDataWrapper = AllBannerDataWrapper(it, null, "来自网络数据源")
             articleList.add(0, bannerDataWrapper)
 

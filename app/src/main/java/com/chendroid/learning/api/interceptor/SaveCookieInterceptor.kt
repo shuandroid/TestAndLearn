@@ -28,7 +28,7 @@ class SaveCookieInterceptor : Interceptor {
             val cookie = encodeCookie(cookies)
             saveCookie(requestUrl, domain, cookie)
         }
-
+        response.body().string()
         return response
     }
 

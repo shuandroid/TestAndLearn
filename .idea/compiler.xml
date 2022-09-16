@@ -24,6 +24,7 @@
       <module name="annotation" target="1.7" />
       <module name="processor" target="1.7" />
       <module name="TestAndLearn.app" target="1.8" />
+      <module name="TestAndLearn.buildSrc" target="1.8" />
       <module name="TestAndLearn.core" target="1.8" />
       <module name="TestAndLearn.demo" target="1.8" />
     </bytecodeTargetLevel>

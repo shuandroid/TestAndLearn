@@ -188,6 +188,9 @@ class DragCustomView @JvmOverloads constructor(context: Context, attrs: Attribut
 
     private fun testSpring() {
 
+        invalidate()
+        requestLayout()
+
         // todo spring 动画
 
         // SpringForce 不能使用同一个，不然，finalPosition 会被覆盖掉

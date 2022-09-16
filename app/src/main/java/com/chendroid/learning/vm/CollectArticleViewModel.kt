@@ -19,7 +19,8 @@ import kotlinx.coroutines.withContext
  */
 class CollectArticleViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val collectArticleRepo = CollectArticleRepo(CollectArticleDataSource(ApiServiceHelper.newWanService))
+    private val collectArticleRepo =
+        CollectArticleRepo(CollectArticleDataSource(ApiServiceHelper.newWanService))
 
     /**
      * 收藏文章

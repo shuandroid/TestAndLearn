@@ -29,7 +29,12 @@ class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClic
          * isCollected, 是否收藏过
          * handleResult, 高阶函数，
          */
-        fun onCollectViewClicked(articleId: Int, originId: Int, isCollected: Boolean, handleResult: (Boolean) -> Unit)
+        fun onCollectViewClicked(
+            articleId: Int,
+            originId: Int,
+            isCollected: Boolean,
+            handleResult: (Boolean) -> Unit
+        )
     }
 
     var homeItemListener: HomeItemListener? = null
@@ -102,11 +107,15 @@ class HomeListItemHolder(view: View) : SugarHolder<BaseDatas>(view), View.OnClic
      * 开启收藏喜欢动画， 难看的动画  「只有缩放」
      */
     private fun startLikeAnimator() {
+        animatorAliveSet?.run {
+            if (isRunning) {
+                cancel()
+            }
+        }
 
         val scaleXAnim = ObjectAnimator.ofFloat(articleLikeView, "scaleX", 0.4f)
 
         val scaleYAnim = ObjectAnimator.ofFloat(articleLikeView, "scaleY", 0.4f)
-
         val animatorSet = AnimatorSet()
         val animatorNewSet = AnimatorSet()
 

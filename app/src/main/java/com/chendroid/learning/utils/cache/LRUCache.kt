@@ -55,7 +55,7 @@ class LRUCache {
      * 在超过容量时，需要使用 linkedList.removeFirst, 移除第一个原素；因为 HashMap 无序
      *
      */
-    fun put(key: Int, value: Int) {
+    private fun put(key: Int, value: Int) {
 
         // 如果已经有该数据
         if (hashMap.containsKey(key)) {

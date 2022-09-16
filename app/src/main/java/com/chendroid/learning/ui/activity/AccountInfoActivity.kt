@@ -195,7 +195,6 @@ class AccountInfoActivity : BaseActivity() {
         Log.i("zc_test", "AccountInfoActivity handleBitmap bitmap is" + bitmap)
 
         targetBitmap = bitmap
-//        customDragAvatarView.targetBitmap = this.targetBitmap
 
         contentView.setTestTargetBitmap(this.targetBitmap)
     }

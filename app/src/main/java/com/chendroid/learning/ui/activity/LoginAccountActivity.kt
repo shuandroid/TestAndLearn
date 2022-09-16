@@ -10,7 +10,7 @@ import com.chendroid.learning.R
 /**
  * @intro 登录账号的 activity
  * @author zhaochen@ZhiHu Inc.
- * @since 2019-11-20
+ * @since 2019-11-20 不使用了，可删除
  */
 class LoginAccountActivity : AppCompatActivity() {
 

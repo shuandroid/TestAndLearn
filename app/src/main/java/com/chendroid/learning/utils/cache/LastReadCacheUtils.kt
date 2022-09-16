@@ -25,7 +25,7 @@ object LastReadCacheUtils {
      *  添加正在看的文章 id
      */
     @JvmStatic
-    fun addAiticleId(currentArticleId: Long) {
+    fun addArticleId(currentArticleId: Long) {
 
         // 要先判断是否有和 currentAnswerId 重复的值， 有的话，则去除掉
         for (id: Long in lastArticleList) {
